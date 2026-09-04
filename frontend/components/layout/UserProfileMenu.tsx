@@ -266,12 +266,12 @@ export const UserProfileMenu: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                        <span>Admin (Joint Command)</span>
+                        <span>Admin Console</span>
                         {currentUser.role === 'admin' && (
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 font-mono">CMDR. R. Menon • #MC-904</p>
+                      <p className="text-[10px] text-slate-500 font-mono">Joint Command & System Governance</p>
                     </div>
                   </div>
                   <span className="text-[10px] font-mono text-indigo-700 font-bold bg-white px-2 py-0.5 rounded border border-indigo-200">
@@ -299,7 +299,7 @@ export const UserProfileMenu: React.FC = () => {
                           <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 font-mono">ACP V. Sharma • #BTP-412</p>
+                      <p className="text-[10px] text-slate-500 font-mono">Traffic Police & TMC Enforcement</p>
                     </div>
                   </div>
                   <span className="text-[10px] font-mono text-rose-700 font-bold bg-white px-2 py-0.5 rounded border border-rose-200">
@@ -327,7 +327,7 @@ export const UserProfileMenu: React.FC = () => {
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 font-mono">ENG. K. Priya • #BBMP-780</p>
+                      <p className="text-[10px] text-slate-500 font-mono">PWD & BBMP Civil Works</p>
                     </div>
                   </div>
                   <span className="text-[10px] font-mono text-amber-800 font-bold bg-white px-2 py-0.5 rounded border border-amber-200">
