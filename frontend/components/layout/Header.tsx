@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUrbanStore } from '@/store/useUrbanStore';
-import { ConnectionIndicator } from '@/components/layout/ConnectionIndicator';
 import { UserProfileMenu } from '@/components/layout/UserProfileMenu';
 import {
   Bell,
@@ -110,9 +109,6 @@ export const Header: React.FC = () => {
               {isMounted ? dateOnly : 'SYNCHRONIZING'}
             </div>
           </div>
-
-          {/* Mission Control Connection Indicator */}
-          <ConnectionIndicator />
 
           {/* Priority Alert Notification Trigger */}
           <Link
