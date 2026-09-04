@@ -478,19 +478,29 @@ export const MapView: React.FC<MapViewProps> = ({
               { id: 'rash_driving', label: 'Rash Driving' },
               { id: 'bus_footboard', label: 'Footboard' },
               { id: 'hit_and_run', label: 'Hit-and-Run' },
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveFilter(cat.id as MapFilterCategory)}
-                className={`px-2 py-1 rounded text-left transition text-[11px] font-mono truncate ${
-                  activeFilter === cat.id
-                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+            ].map((cat) => {
+              const isSelected = activeFilter === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    if (isSelected && cat.id !== 'all') {
+                      setActiveFilter('all');
+                    } else {
+                      setActiveFilter(cat.id as MapFilterCategory);
+                    }
+                  }}
+                  className={`px-2 py-1 rounded text-left transition text-[11px] font-mono truncate ${
+                    isSelected
+                      ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                  }`}
+                  title={isSelected && cat.id !== 'all' ? 'Click to deselect filter' : cat.label}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 

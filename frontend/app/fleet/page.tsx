@@ -83,26 +83,30 @@ export default function FleetPage() {
             { id: 'ONLINE' as const, label: 'Online', count: onlineBuses, color: 'text-emerald-700' },
             { id: 'WARNING' as const, label: 'Warning', count: warningBuses, color: 'text-amber-700' },
             { id: 'OFFLINE' as const, label: 'Offline', count: offlineBuses, color: 'text-rose-700' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shrink-0 ${
-                statusFilter === tab.id
-                  ? 'bg-pewter-blue text-white shadow-sm'
-                  : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <span>{tab.label}</span>
-              <span
-                className={`text-[10px] font-mono ${
-                  statusFilter === tab.id ? 'text-white/80' : 'text-slate-400'
+          ].map((tab) => {
+            const isSel = statusFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setStatusFilter(isSel && tab.id !== 'ALL' ? 'ALL' : tab.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shrink-0 ${
+                  isSel
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
+                title={isSel && tab.id !== 'ALL' ? 'Click to deselect filter' : tab.label}
               >
-                ({tab.count})
-              </span>
-            </button>
-          ))}
+                <span>{tab.label}</span>
+                <span
+                  className={`text-[10px] font-mono ${
+                    isSel ? 'text-white/80' : 'text-slate-400'
+                  }`}
+                >
+                  ({tab.count})
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Fleet Search Box */}
