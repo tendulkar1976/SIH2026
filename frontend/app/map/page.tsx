@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { MapView, MapFilterCategory } from '@/components/map/MapView';
-import { EventSimulatorControls } from '@/components/common/EventSimulatorControls';
 import { useUrbanStore } from '@/store/useUrbanStore';
 import {
   MapPin,
@@ -28,9 +27,6 @@ export default function MapPage() {
 
   return (
     <div className="space-y-6">
-      {/* Simulation Controls Banner */}
-      <EventSimulatorControls />
-
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useUrbanStore } from '@/store/useUrbanStore';
 import { AlertCard } from '@/components/alerts/AlertCard';
-import { EventSimulatorControls } from '@/components/common/EventSimulatorControls';
 import {
   Bell,
   AlertTriangle,
@@ -51,9 +50,6 @@ export default function AlertsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Simulation Controls Banner */}
-      <EventSimulatorControls />
-
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

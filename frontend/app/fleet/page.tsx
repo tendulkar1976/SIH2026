@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useUrbanStore } from '@/store/useUrbanStore';
 import { FleetCard } from '@/components/fleet/FleetCard';
 import { BusDetailModal } from '@/components/fleet/BusDetailModal';
-import { EventSimulatorControls } from '@/components/common/EventSimulatorControls';
 import { BusTelemetry, BusStatus } from '@/types';
 import {
   Bus,
@@ -45,9 +44,6 @@ export default function FleetPage() {
 
   return (
     <div className="space-y-6">
-      {/* Simulation Controls Banner */}
-      <EventSimulatorControls />
-
       {/* Fleet Overview Metrics */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

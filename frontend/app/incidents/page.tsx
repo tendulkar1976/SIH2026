@@ -3,7 +3,6 @@
 import React from 'react';
 import { IncidentTable } from '@/components/incidents/IncidentTable';
 import { FilterBar } from '@/components/incidents/FilterBar';
-import { EventSimulatorControls } from '@/components/common/EventSimulatorControls';
 import { useUrbanStore } from '@/store/useUrbanStore';
 import { AlertOctagon } from 'lucide-react';
 
@@ -12,7 +11,6 @@ export default function IncidentsPage() {
 
   return (
     <div className="space-y-6">
-      <EventSimulatorControls />
 
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

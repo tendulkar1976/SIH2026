@@ -8,14 +8,10 @@ import { IncidentDistributionChart } from '@/components/dashboard/IncidentDistri
 import { RecentIncidentsTable } from '@/components/dashboard/RecentIncidentsTable';
 import { MapPreview } from '@/components/dashboard/MapPreview';
 import { FleetSummaryWidget } from '@/components/dashboard/FleetSummaryWidget';
-import { EventSimulatorControls } from '@/components/common/EventSimulatorControls';
 
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      {/* Simulation Controls Banner */}
-      <EventSimulatorControls />
-
       {/* 1. KPI Section: Total Incidents, Potholes, Missing Zebra Crossings, Rash Driving, Vehicles Detected, Active Alerts */}
       <KPISection />
 
