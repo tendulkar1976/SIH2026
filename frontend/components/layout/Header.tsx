@@ -18,8 +18,10 @@ export const Header: React.FC = () => {
   const pathname = usePathname();
   const { stats } = useUrbanStore();
   const [timeString, setTimeString] = useState<string>('');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const updateTime = () => {
       const now = new Date();
       setTimeString(
@@ -51,8 +53,6 @@ export const Header: React.FC = () => {
     if (pathname === '/incidents') return 'Incident Management Registry';
     if (pathname === '/fleet') return 'Transit Fleet Telemetry & Health';
     if (pathname === '/analytics') return 'Spatial & Temporal Analytics';
-    if (pathname === '/alerts') return 'Priority Emergency Alerts';
-    if (pathname === '/settings') return 'System Configuration & Parameters';
     return 'Urban Intelligence Platform';
   };
 
@@ -86,7 +86,7 @@ export const Header: React.FC = () => {
 
         <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 bg-slate-50 font-mono text-xs text-slate-600 shadow-xs">
           <Clock className="w-3.5 h-3.5 text-indigo-600" />
-          <span>{timeString || 'SYNCHRONIZING...'}</span>
+          <span>{isMounted ? timeString : 'SYNCHRONIZING...'}</span>
         </div>
       </div>
 
@@ -94,11 +94,11 @@ export const Header: React.FC = () => {
       <div className="flex items-center gap-3">
         <ConnectionIndicator />
 
-        {/* Alerts Button */}
+        {/* Alerts Notification Button linking to Incident Registry */}
         <Link
-          href="/alerts"
+          href="/incidents"
           className="relative p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:border-indigo-300 hover:bg-slate-50 transition shadow-xs"
-          title="View Active Alerts"
+          title="View High-Priority Incidents"
         >
           <Bell className="w-4 h-4" />
           {stats.active_alerts > 0 && (
@@ -122,4 +122,5 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+
 

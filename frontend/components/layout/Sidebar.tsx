@@ -11,8 +11,6 @@ import {
   MapPin,
   Bus,
   BarChart3,
-  Bell,
-  Settings,
   Activity,
   ShieldCheck,
 } from 'lucide-react';
@@ -51,13 +49,6 @@ export const Sidebar: React.FC = () => {
       badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
     },
     {
-      name: 'Priority Alerts',
-      href: '/alerts',
-      icon: Bell,
-      badge: stats.active_alerts > 0 ? `${stats.active_alerts}` : null,
-      badgeColor: 'bg-rose-50 text-rose-700 border-rose-200 font-bold',
-    },
-    {
       name: 'Transit Fleet Nodes',
       href: '/fleet',
       icon: Bus,
@@ -68,12 +59,6 @@ export const Sidebar: React.FC = () => {
       name: 'Urban Analytics',
       href: '/analytics',
       icon: BarChart3,
-      badge: null,
-    },
-    {
-      name: 'System Settings',
-      href: '/settings',
-      icon: Settings,
       badge: null,
     },
   ];
@@ -180,4 +165,5 @@ export const Sidebar: React.FC = () => {
     </aside>
   );
 };
+
 

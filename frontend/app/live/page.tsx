@@ -6,8 +6,6 @@ import { BusInfoHeader } from '@/components/live/BusInfoHeader';
 import { VideoPanel } from '@/components/live/VideoPanel';
 import { DetectionPanel } from '@/components/live/DetectionPanel';
 import { LiveActivityFeed } from '@/components/live/LiveActivityFeed';
-import { EventSimulatorControls } from '@/components/common/EventSimulatorControls';
-import { Radio, Eye, Layers } from 'lucide-react';
 
 export default function LiveMonitoringPage() {
   const { buses, selectedBusId } = useUrbanStore();
@@ -15,9 +13,6 @@ export default function LiveMonitoringPage() {
 
   return (
     <div className="space-y-6">
-      {/* Simulation Controls Banner */}
-      <EventSimulatorControls />
-
       {/* 1. Bus Info & Telemetry Header */}
       <BusInfoHeader bus={currentBus} />
 
@@ -43,3 +38,4 @@ export default function LiveMonitoringPage() {
     </div>
   );
 }
+

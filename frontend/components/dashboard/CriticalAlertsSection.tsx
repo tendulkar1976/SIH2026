@@ -61,10 +61,10 @@ export const CriticalAlertsSection: React.FC = () => {
         </div>
 
         <Link
-          href="/alerts"
+          href="/incidents"
           className="text-xs font-mono font-medium text-rose-700 hover:text-rose-800 flex items-center gap-1 transition"
         >
-          <span>View All Alerts ({stats.active_alerts})</span>
+          <span>View All Incidents ({stats.total_incidents})</span>
           <ChevronRight className="w-3.5 h-3.5" />
         </Link>
       </div>
