@@ -61,13 +61,36 @@ export default function AnalyticsPage() {
     fontSize: '12px',
   };
 
+  const handleExportAnalytics = () => {
+    // Generate analytics summary CSV
+    const rows = [
+      ['Metric / Category', 'Count / Value', 'Period'],
+      ['Total Vehicles Counted', data.total_vehicles_counted, selectedDateRange],
+      ...data.incidents_by_type.map((t) => [`Incident Type: ${t.type}`, t.count, selectedDateRange]),
+      ...data.incidents_by_route.map((r) => [`Route: ${r.route}`, r.count, selectedDateRange]),
+      ...data.vehicle_distribution.map((v) => [`Vehicle Class: ${v.category}`, v.count, selectedDateRange]),
+      ...data.pothole_distribution.map((p) => [`Pothole Severity: ${p.severity}`, p.count, selectedDateRange]),
+    ];
+
+    const csvContent = rows.map((r) => r.map((c) => `"${c}"`).join(',')).join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `urbansense_analytics_${selectedDateRange}_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Top Header & Export */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-pewter-blue" />
+            <BarChart3 className="w-5 h-5 text-indigo-600" />
             <span>Urban Intelligence Analytics & Spatial Frequency</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -76,11 +99,11 @@ export default function AnalyticsPage() {
         </div>
 
         <button
-          onClick={() => alert('Exporting Analytics Intelligence Report (CSV/PDF)...')}
-          className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition flex items-center gap-2 text-xs font-semibold shadow-sm self-start sm:self-auto"
+          onClick={handleExportAnalytics}
+          className="px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center gap-2 text-xs font-semibold shadow-xs self-start sm:self-auto font-mono"
         >
-          <Download className="w-4 h-4 text-pewter-blue" />
-          <span>Export Analytics Report</span>
+          <Download className="w-4 h-4 text-indigo-600" />
+          <span>Export Analytics CSV</span>
         </button>
       </div>
 
