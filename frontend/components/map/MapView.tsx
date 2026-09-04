@@ -209,7 +209,16 @@ export const MapView: React.FC<MapViewProps> = ({
     });
   }, [tileMode]);
 
-  // Render Bus Route Polylines
+  // Route condition definitions
+  const routeConditionMeta: Record<string, { color: string; rci: number; status: string; name: string; density: number }> = {
+    'R-18': { color: '#dc2626', rci: 54, status: 'Critical Distress', name: 'Whitefield Corridor', density: 4.8 },
+    'R-05': { color: '#d97706', rci: 68, status: 'Degraded', name: 'Electronic City Spine', density: 2.3 },
+    'R-24': { color: '#ea580c', rci: 73, status: 'Moderate', name: 'Silk Board Corridor', density: 1.8 },
+    'R-12': { color: '#16a34a', rci: 84, status: 'Good Condition', name: 'Koramangala 80ft', density: 1.1 },
+    'R-09': { color: '#059669', rci: 92, status: 'Optimal Surface', name: 'Hebbal Expressway', density: 0.4 },
+  };
+
+  // Render Bus Route Polylines with Road Condition Index Coloring
   useEffect(() => {
     if (typeof window === 'undefined' || !mapInstanceRef.current) return;
 
@@ -221,25 +230,34 @@ export const MapView: React.FC<MapViewProps> = ({
       routeLayersRef.current = [];
 
       if (showRoutePolylines) {
-        const routeColors = ['#4f46e5', '#0284c7', '#7c3aed', '#10b981', '#f59e0b'];
-        let colorIdx = 0;
-
         Object.entries(routePolylines).forEach(([routeId, coords]) => {
-          const color = routeColors[colorIdx % routeColors.length];
-          colorIdx++;
+          const meta = routeConditionMeta[routeId] || {
+            color: '#4f46e5',
+            rci: 75,
+            status: 'Normal',
+            name: `Route ${routeId}`,
+            density: 1.5,
+          };
 
           const poly = L.polyline(coords, {
-            color: color,
-            weight: 3.5,
-            opacity: 0.65,
+            color: meta.color,
+            weight: 4.5,
+            opacity: 0.8,
             dashArray: '6, 6',
           }).addTo(map);
 
-          poly.bindTooltip(`<strong>Bus Route ${routeId}</strong>`, {
-            permanent: false,
-            direction: 'center',
-            className: 'route-poly-tooltip',
-          });
+          poly.bindTooltip(
+            `<div style="font-family: inherit; font-size: 11px; padding: 2px;">
+              <strong style="color: ${meta.color}; font-size: 12px;">Bus Route ${routeId} • ${meta.name}</strong><br/>
+              <span>Road Condition: <strong>${meta.rci}/100 (${meta.status})</strong></span><br/>
+              <span>Defect Density: <strong>${meta.density} defects/km</strong></span>
+            </div>`,
+            {
+              permanent: false,
+              direction: 'center',
+              className: 'route-poly-tooltip',
+            }
+          );
 
           routeLayersRef.current.push(poly);
         });

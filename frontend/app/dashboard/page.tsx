@@ -9,9 +9,14 @@ import { RecentIncidentsTable } from '@/components/dashboard/RecentIncidentsTabl
 import { MapPreview } from '@/components/dashboard/MapPreview';
 import { FleetSummaryWidget } from '@/components/dashboard/FleetSummaryWidget';
 
+import { PipelineRibbon } from '@/components/dashboard/PipelineRibbon';
+
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
+      {/* 0. End-to-End Edge Urban Sensing Pipeline Ribbon */}
+      <PipelineRibbon />
+
       {/* 1. KPI Section: Total Incidents, Potholes, Missing Zebra Crossings, Rash Driving, Vehicles Detected, Active Alerts */}
       <KPISection />
 

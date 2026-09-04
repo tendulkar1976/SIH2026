@@ -13,6 +13,9 @@ import {
   BarChart3,
   Activity,
   ShieldCheck,
+  Construction,
+  Car,
+  FileText,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -42,6 +45,19 @@ export const Sidebar: React.FC = () => {
       badge: null,
     },
     {
+      name: 'Road Intelligence',
+      href: '/road-intelligence',
+      icon: Construction,
+      badge: 'PWD',
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200 font-bold',
+    },
+    {
+      name: 'Traffic & OD Flow',
+      href: '/traffic',
+      icon: Car,
+      badge: null,
+    },
+    {
       name: 'Incident Registry',
       href: '/incidents',
       icon: AlertOctagon,
@@ -59,6 +75,12 @@ export const Sidebar: React.FC = () => {
       name: 'Urban Analytics',
       href: '/analytics',
       icon: BarChart3,
+      badge: null,
+    },
+    {
+      name: 'Civic Reports & Export',
+      href: '/reports',
+      icon: FileText,
       badge: null,
     },
   ];

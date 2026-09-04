@@ -160,3 +160,90 @@ export interface AnalyticsSummary {
 }
 
 export type ConnectionStatus = 'LIVE' | 'RECONNECTING' | 'OFFLINE' | 'connected' | 'reconnecting' | 'disconnected' | 'simulating';
+
+// Road & Infrastructure Intelligence
+export type RepairStatus = 'backlog' | 'scheduled' | 'in_progress' | 'repaired';
+
+export interface RoadDefectRecord {
+  id: string;
+  defect_type: 'pothole' | 'waterlogging' | 'damaged_divider' | 'missing_crossing' | 'road_cracking';
+  severity: IncidentSeverity;
+  corridor_id: string;
+  corridor_name: string;
+  location_landmark: string;
+  latitude: number;
+  longitude: number;
+  estimated_depth_cm?: number;
+  estimated_area_sqm?: number;
+  priority_score: number; // 1-100 (Higher = more urgent)
+  repair_status: RepairStatus;
+  work_order_id: string;
+  assigned_contractor?: string;
+  detecting_bus_id: string;
+  timestamp: string;
+  evidence_image: string;
+}
+
+export interface CorridorHealthScore {
+  corridor_id: string;
+  name: string;
+  road_condition_index: number; // 0-100 (Higher = Better)
+  status: 'excellent' | 'good' | 'degraded' | 'critical';
+  pothole_count: number;
+  waterlogging_spots: number;
+  divider_issues: number;
+  missing_crossings: number;
+  total_defects_per_km: number;
+  last_surveyed: string;
+}
+
+// Traffic Intelligence & OD Analytics
+export type CongestionLevel = 'low' | 'moderate' | 'severe' | 'gridlock';
+
+export interface TrafficBottleneck {
+  id: string;
+  junction_name: string;
+  corridor_id: string;
+  latitude: number;
+  longitude: number;
+  congestion_level: CongestionLevel;
+  current_speed_kmh: number;
+  free_flow_speed_kmh: number;
+  delay_minutes: number;
+  queue_length_meters: number;
+  primary_cause: string;
+  last_updated: string;
+}
+
+export interface CorridorCongestion {
+  corridor_id: string;
+  name: string;
+  congestion_level: CongestionLevel;
+  average_speed_kmh: number;
+  speed_limit_kmh: number;
+  vehicle_volume_per_hour: number;
+  travel_time_index: number;
+  hourly_speed_profile: { hour: string; speed: number; benchmark: number }[];
+}
+
+export interface ODTrafficFlow {
+  origin_zone: string;
+  destination_zone: string;
+  passenger_trips_est: number;
+  vehicle_flow_volume: number;
+  avg_travel_time_mins: number;
+  corridor_utilized: string;
+}
+
+export interface CivicReportSummary {
+  id: string;
+  report_type: 'pwd_road_maintenance' | 'police_traffic_violations' | 'transit_safety_audit' | 'executive_briefing';
+  title: string;
+  period: string;
+  generated_at: string;
+  total_items: number;
+  critical_items: number;
+  assigned_agency: string;
+  status: 'ready' | 'archived';
+  file_size_kb: number;
+}
