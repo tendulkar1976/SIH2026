@@ -8,7 +8,7 @@ import { SeverityBadge } from '@/components/common/SeverityBadge';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { EvidenceViewer } from '@/components/incidents/EvidenceViewer';
 import { IncidentMiniMap } from '@/components/incidents/IncidentMiniMap';
-import { IncidentStatus } from '@/types';
+import { IncidentStatus, DepartmentType } from '@/types';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -21,6 +21,10 @@ import {
   Activity,
   ExternalLink,
   FileText,
+  Printer,
+  Building2,
+  ShieldAlert,
+  Download,
 } from 'lucide-react';
 
 export default function IncidentDetailsPage() {
@@ -28,7 +32,7 @@ export default function IncidentDetailsPage() {
   const router = useRouter();
   const id = params.id as string;
 
-  const { incidents, updateIncidentStatus } = useUrbanStore();
+  const { incidents, updateIncidentStatus, assignDepartment } = useUrbanStore();
   const incident = incidents.find((i) => i.id === id);
 
   const [isUpdating, setIsUpdating] = useState(false);
@@ -46,7 +50,7 @@ export default function IncidentDetailsPage() {
         </p>
         <Link
           href="/incidents"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-pewter-blue text-white text-xs font-semibold shadow-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Incident Registry
@@ -57,14 +61,23 @@ export default function IncidentDetailsPage() {
 
   const handleStatusChange = async (newStatus: IncidentStatus) => {
     setIsUpdating(true);
-    // 1. Optimistic state mutation
     updateIncidentStatus(incident.id, newStatus);
-    // 2. Call REST API service abstraction
     await apiService.updateIncidentStatus(incident.id, newStatus);
     setIsUpdating(false);
 
-    setFeedbackNotice(`Status successfully updated to ${newStatus.toUpperCase()}`);
-    setTimeout(() => setFeedbackNotice(null), 3000);
+    setFeedbackNotice(`Investigation status updated to ${newStatus.toUpperCase()}`);
+    setTimeout(() => setFeedbackNotice(null), 3500);
+  };
+
+  const handleDepartmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const dept = e.target.value as DepartmentType;
+    assignDepartment(incident.id, dept);
+    setFeedbackNotice(`Assigned department re-routed to ${dept.toUpperCase().replace('_', ' ')}`);
+    setTimeout(() => setFeedbackNotice(null), 3500);
+  };
+
+  const handlePrintReport = () => {
+    window.print();
   };
 
   return (
@@ -89,17 +102,28 @@ export default function IncidentDetailsPage() {
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
               Category:{' '}
-              <strong className="text-pewter-blue uppercase font-semibold">
-                {incident.type.replace('_', ' ')}
+              <strong className="text-indigo-600 uppercase font-semibold">
+                {incident.type.replace(/_/g, ' ')}
               </strong>
             </p>
           </div>
         </div>
 
-        {/* Status Workflow Controls */}
+        {/* Action Buttons: Print PDF & Status Workflow */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-slate-500 mr-1 font-medium">Status Workflow:</span>
+          {/* Printable Official Inspection Report Action */}
+          <button
+            onClick={handlePrintReport}
+            className="px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center gap-1.5 text-xs font-semibold font-mono shadow-xs"
+            title="Generate official printable civic dossier / PDF"
+          >
+            <Printer className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Print Dossier / PDF</span>
+          </button>
 
+          <span className="text-slate-300 mx-1">|</span>
+
+          {/* Status Workflow Controls */}
           <button
             onClick={() => handleStatusChange('new')}
             disabled={incident.status === 'new' || isUpdating}
@@ -169,9 +193,9 @@ export default function IncidentDetailsPage() {
           {/* Incident Full Description */}
           <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-clean-card space-y-2">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-              <FileText className="w-4 h-4 text-pewter-blue" />
+              <FileText className="w-4 h-4 text-indigo-600" />
               <h3 className="text-xs font-bold font-sans uppercase tracking-wider text-slate-900">
-                Incident Synopsis & Log
+                Incident Synopsis & Vision Telemetry Log
               </h3>
             </div>
             <p className="text-xs text-slate-700 leading-relaxed pt-1">
@@ -180,15 +204,42 @@ export default function IncidentDetailsPage() {
           </div>
         </div>
 
-        {/* Right Column: Forensics & Mini Map (5 cols) */}
+        {/* Right Column: Forensics, Department Routing & Mini Map (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* Forensics Metadata */}
           <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-clean-card space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-              <Activity className="w-4 h-4 text-pewter-blue" />
-              <h3 className="text-xs font-bold font-sans uppercase tracking-wider text-slate-900">
-                Telemetry & Forensic Metadata
-              </h3>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-indigo-600" />
+                <h3 className="text-xs font-bold font-sans uppercase tracking-wider text-slate-900">
+                  Forensic Telemetry & Dispatch
+                </h3>
+              </div>
+            </div>
+
+            {/* Department Assignment Box */}
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider flex items-center gap-1">
+                  <Building2 className="w-3 h-3 text-indigo-600" />
+                  Assigned Civic Department
+                </span>
+                {incident.work_order_id && (
+                  <span className="font-mono text-[10px] bg-indigo-100 text-indigo-900 px-2 py-0.5 rounded font-bold">
+                    {incident.work_order_id}
+                  </span>
+                )}
+              </div>
+              <select
+                value={incident.assigned_department || 'pwd_roads'}
+                onChange={handleDepartmentChange}
+                className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-indigo-600 font-mono shadow-xs"
+              >
+                <option value="pwd_roads">🛠️ PWD / Public Works (Roads & Bridges)</option>
+                <option value="traffic_police">👮 Traffic Enforcement & Police</option>
+                <option value="transit_auth">🚌 City Transit Authority (Fleet Operations)</option>
+                <option value="municipal_corp">🏛️ Municipal Corporation (Drainage & Sanitation)</option>
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
@@ -208,7 +259,7 @@ export default function IncidentDetailsPage() {
 
               <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
                 <span className="text-[10px] text-slate-500 font-semibold block uppercase tracking-wider">DETECTING BUS</span>
-                <span className="text-sm font-bold font-mono text-pewter-blue">{incident.bus_id}</span>
+                <span className="text-sm font-bold font-mono text-indigo-600">{incident.bus_id}</span>
               </div>
 
               <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
@@ -244,12 +295,12 @@ export default function IncidentDetailsPage() {
             <div className="space-y-2 pt-2 border-t border-slate-100">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-600 flex items-center gap-1.5 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-pewter-blue" />
+                  <MapPin className="w-3.5 h-3.5 text-indigo-600" />
                   Corridor Map Location:
                 </span>
                 <Link
                   href="/map"
-                  className="text-pewter-blue hover:underline flex items-center gap-1 text-[11px] font-semibold"
+                  className="text-indigo-600 hover:underline flex items-center gap-1 text-[11px] font-semibold"
                 >
                   <span>Full GIS Map</span>
                   <ExternalLink className="w-3 h-3" />

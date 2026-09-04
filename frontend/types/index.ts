@@ -1,15 +1,30 @@
 export type IncidentType =
   | 'pothole'
+  | 'damaged_divider'
+  | 'missing_signboard'
+  | 'waterlogging'
+  | 'open_drain_garbage'
   | 'missing_crossing'
+  | 'footpath_encroachment'
   | 'rash_driving'
-  | 'vehicle'
-  | 'pedestrian'
+  | 'wrong_way'
+  | 'bus_footboard'
+  | 'red_light_violation'
+  | 'illegal_parking'
   | 'anpr'
-  | 'hit_and_run';
+  | 'hit_and_run'
+  | 'vehicle'
+  | 'pedestrian';
 
 export type IncidentSeverity = 'low' | 'medium' | 'high' | 'critical';
 
 export type IncidentStatus = 'new' | 'investigating' | 'resolved' | 'dismissed';
+
+export type DepartmentType =
+  | 'pwd_roads'
+  | 'traffic_police'
+  | 'transit_auth'
+  | 'municipal_corp';
 
 export type CameraStatus = 'LIVE' | 'CONNECTING' | 'OFFLINE' | 'ERROR';
 
@@ -33,6 +48,8 @@ export interface IncidentEvent {
   vehicle_id: string | null;
   license_plate: string | null;
   status: IncidentStatus;
+  assigned_department: DepartmentType;
+  work_order_id?: string | null;
   evidence_image: string | null;
   evidence_video: string | null;
   description: string;
