@@ -32,19 +32,19 @@ export const RecentIncidentsTable: React.FC = () => {
       case 'rash_driving':
         return <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />;
       case 'missing_crossing':
-        return <Footprints className="w-3.5 h-3.5 text-pewter-darkBlue" />;
+        return <Footprints className="w-3.5 h-3.5 text-indigo-600" />;
       case 'anpr':
         return <ShieldAlert className="w-3.5 h-3.5 text-purple-600" />;
       case 'pedestrian':
         return <Footprints className="w-3.5 h-3.5 text-emerald-600" />;
       case 'vehicle':
       default:
-        return <Car className="w-3.5 h-3.5 text-pewter-darkBlue" />;
+        return <Car className="w-3.5 h-3.5 text-indigo-600" />;
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-clean overflow-hidden flex flex-col justify-between">
+    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-clean-card overflow-hidden flex flex-col justify-between">
       <div>
         {/* Header */}
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
@@ -54,7 +54,7 @@ export const RecentIncidentsTable: React.FC = () => {
           </div>
           <Link
             href="/incidents"
-            className="text-xs font-mono text-pewter-darkBlue hover:text-pewter-blue flex items-center gap-1 font-semibold transition"
+            className="text-xs font-mono text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-semibold transition"
           >
             <span>View All Registry</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -84,7 +84,7 @@ export const RecentIncidentsTable: React.FC = () => {
                   className="hover:bg-slate-50/80 transition cursor-pointer group"
                 >
                   {/* ID */}
-                  <td className="py-3 px-4 font-mono font-bold text-slate-900 group-hover:text-pewter-darkBlue transition">
+                  <td className="py-3 px-4 font-mono font-bold text-slate-900 group-hover:text-indigo-600 transition">
                     {inc.id}
                   </td>
 
@@ -114,9 +114,9 @@ export const RecentIncidentsTable: React.FC = () => {
                   </td>
 
                   {/* Bus */}
-                  <td className="py-3 px-4 font-mono text-pewter-darkBlue font-semibold text-[11px]">
+                  <td className="py-3 px-4 font-mono text-indigo-600 font-semibold text-[11px]">
                     <div className="flex items-center gap-1">
-                      <Radio className="w-3 h-3 text-pewter-blue" />
+                      <Radio className="w-3 h-3 text-indigo-500" />
                       <span>{inc.bus_id}</span>
                     </div>
                   </td>
@@ -142,9 +142,9 @@ export const RecentIncidentsTable: React.FC = () => {
 
                   {/* Action */}
                   <td className="py-3 px-4 text-right">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-600 group-hover:text-slate-900 group-hover:border-slate-300 text-[11px] font-mono shadow-clean-sm transition">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-600 group-hover:text-slate-900 group-hover:border-slate-300 text-[11px] font-mono shadow-xs transition">
                       <span>Dossier</span>
-                      <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-pewter-darkBlue" />
+                      <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-indigo-600" />
                     </span>
                   </td>
                 </tr>
@@ -156,3 +156,4 @@ export const RecentIncidentsTable: React.FC = () => {
     </div>
   );
 };
+

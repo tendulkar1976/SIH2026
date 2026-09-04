@@ -9,22 +9,45 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Pewter, Steel Blue & Taupe Executive Palette (#909EAE, #5C8DC5, #AD9E90, #736F60)
-        pewter: {
-          light: '#909EAE',   // Slate Blue-Gray
-          blue: '#5C8DC5',    // Primary Cobalt Steel Blue
-          darkBlue: '#3B72AF', // Deep Steel Blue for high-contrast text/buttons
-          taupe: '#AD9E90',   // Warm Taupe
-          darkTaupe: '#8C7A6B',// Rich Warm Taupe for text
-          stone: '#736F60',   // Deep Stone
+        // Indigo & Cobalt Enterprise Palette (Stripe / Linear style)
+        brand: {
+          50: '#EEF2FF',
+          100: '#E0E7FF',
+          200: '#C7D2FE',
+          300: '#A5B4FC',
+          400: '#818CF8',
+          500: '#6366F1',
+          600: '#4F46E5', // Primary Electric Indigo
+          700: '#4338CA',
+          800: '#3730A3',
+          900: '#312E81',
         },
-        // Semantic Mapping for Clean Light Theme
+        cobalt: {
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB', // Primary Cobalt Accent
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
+        },
+        pewter: {
+          light: '#64748B',
+          blue: '#4F46E5',
+          darkBlue: '#4338CA',
+          taupe: '#64748B',
+          darkTaupe: '#475569',
+          stone: '#334155',
+        },
         odyssey: {
           darkest: '#F8FAFC',
-          primary: '#5C8DC5',
-          vibrant: '#3B72AF',
-          mint: '#5C8DC5',
-          taupe: '#AD9E90',
+          primary: '#4F46E5',
+          vibrant: '#2563EB',
+          mint: '#10B981',
+          taupe: '#64748B',
         },
         command: {
           50: '#FFFFFF',
@@ -39,29 +62,21 @@ module.exports = {
           900: '#1E293B',
           950: '#0F172A',
           border: '#E2E8F0',
-          'border-active': 'rgba(92, 141, 197, 0.5)',
-          'border-taupe': 'rgba(173, 158, 144, 0.4)',
+          'border-active': 'rgba(79, 70, 229, 0.4)',
         },
-        cyber: {
-          cyan: '#5C8DC5',
-          emerald: '#10B981',
-          amber: '#F59E0B',
-          rose: '#F43F5E',
-          purple: '#8B5CF6',
-          blue: '#3B82F6',
-        }
       },
       fontFamily: {
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       boxShadow: {
-        'clean-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
-        'clean': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-        'clean-md': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
-        'clean-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05)',
-        'clean-card': '0 0 0 1px rgba(226, 232, 240, 0.8), 0 1px 3px 0 rgba(0, 0, 0, 0.04)',
-        'clean-card-hover': '0 0 0 1px rgba(92, 141, 197, 0.35), 0 8px 20px -4px rgba(92, 141, 197, 0.12)',
+        'xs': '0 1px 2px 0 rgba(15, 23, 42, 0.04)',
+        'clean-sm': '0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+        'clean': '0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+        'clean-md': '0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+        'clean-lg': '0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+        'clean-card': '0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+        'clean-card-hover': '0 8px 16px -2px rgba(79, 70, 229, 0.08), 0 0 0 1px rgba(79, 70, 229, 0.3)',
       },
       animation: {
         'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -78,3 +93,4 @@ module.exports = {
   },
   plugins: [],
 }
+

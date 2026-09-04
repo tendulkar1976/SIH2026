@@ -30,11 +30,11 @@ export const IncidentTrendChart: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-clean flex flex-col justify-between h-full space-y-4">
+    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-clean-card flex flex-col justify-between h-full space-y-4">
       {/* Header with period toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-blue-50 border border-blue-100 text-pewter-darkBlue">
+          <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div>
@@ -55,7 +55,7 @@ export const IncidentTrendChart: React.FC = () => {
               onClick={() => setPeriod(p.id)}
               className={`px-3 py-1 rounded-lg text-xs font-mono transition ${
                 period === p.id
-                  ? 'bg-white text-slate-900 font-bold border border-slate-200 shadow-clean-sm'
+                  ? 'bg-white text-indigo-700 font-bold border border-slate-200 shadow-xs'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
@@ -79,8 +79,8 @@ export const IncidentTrendChart: React.FC = () => {
                 <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="crossingArea" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#5C8DC5" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#5C8DC5" stopOpacity={0} />
+                <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -125,7 +125,7 @@ export const IncidentTrendChart: React.FC = () => {
             <Area
               type="monotone"
               dataKey="crossings"
-              stroke="#5C8DC5"
+              stroke="#4F46E5"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#crossingArea)"
@@ -137,8 +137,9 @@ export const IncidentTrendChart: React.FC = () => {
 
       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
         <span>PEAK ANOMALY WINDOW: 18:00 - 20:30 IST</span>
-        <span className="text-pewter-darkBlue font-semibold">Aggregate Vision Confidence: 94.2%</span>
+        <span className="text-indigo-600 font-semibold">Aggregate Vision Confidence: 94.2%</span>
       </div>
     </div>
   );
 };
+

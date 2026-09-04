@@ -16,11 +16,11 @@ export const IncidentDistributionChart: React.FC = () => {
   const totalCount = data.reduce((sum, item) => sum + item.count, 0);
 
   return (
-    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-clean flex flex-col justify-between h-full space-y-4">
+    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-clean-card flex flex-col justify-between h-full space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-blue-50 border border-blue-100 text-pewter-darkBlue">
+          <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600">
             <PieIcon className="w-4 h-4" />
           </div>
           <div>
@@ -28,7 +28,7 @@ export const IncidentDistributionChart: React.FC = () => {
             <p className="text-[11px] font-mono text-slate-500">AI Computer Vision Class Breakdown</p>
           </div>
         </div>
-        <span className="text-xs font-mono text-pewter-darkBlue font-bold px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-100">
+        <span className="text-xs font-mono text-indigo-600 font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-100">
           {totalCount} Total
         </span>
       </div>
@@ -78,7 +78,7 @@ export const IncidentDistributionChart: React.FC = () => {
             <div key={item.name} className="space-y-1">
               <div className="flex items-center justify-between text-[11px]">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-sm shrink-0 shadow-sm" style={{ backgroundColor: item.color }} />
+                  <span className="w-2.5 h-2.5 rounded-sm shrink-0 shadow-xs" style={{ backgroundColor: item.color }} />
                   <span className="text-slate-700 font-medium truncate">{item.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -100,8 +100,9 @@ export const IncidentDistributionChart: React.FC = () => {
 
       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
         <span>PRIMARY HAZARD: ROAD POTHOLES (34%)</span>
-        <span className="text-pewter-darkBlue font-semibold">MODELS: YOLOv10 + OCR</span>
+        <span className="text-indigo-600 font-semibold">MODELS: YOLOv10 + OCR</span>
       </div>
     </div>
   );
 };
+

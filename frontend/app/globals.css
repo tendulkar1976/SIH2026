@@ -10,52 +10,52 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased selection:bg-pewter-blue/20 selection:text-slate-900 font-sans;
+    @apply bg-slate-50 text-slate-900 antialiased selection:bg-brand-500/15 selection:text-brand-900 font-sans;
     background-color: #f8fafc;
     min-height: 100vh;
     overflow-x: hidden;
   }
 }
 
-/* Custom Light Scrollbars */
+/* Custom Clean Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f8fafc;
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Executive Light Theme Clean Surfaces */
+/* Linear & Stripe Style Clean Card Surfaces */
 .glass-panel {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(226, 232, 240, 0.6);
 }
 
 .glass-panel-glow {
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(199, 210, 254, 0.8);
+  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.08), 0 1px 2px -1px rgba(79, 70, 229, 0.04);
 }
 
 .glass-card-hover {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .glass-card-hover:hover {
-  transform: translateY(-2px);
-  border-color: #94a3b8;
-  box-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  transform: translateY(-1.5px);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(99, 102, 241, 0.2);
 }
 
-/* Leaflet Light Map Customization */
+/* Leaflet Clean Map Customization */
 .leaflet-container {
   background: #f8fafc !important;
   font-family: inherit;
@@ -66,7 +66,7 @@
   color: #0f172a !important;
   border: 1px solid #e2e8f0 !important;
   border-radius: 12px !important;
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
 }
 .leaflet-popup-tip {
   background: #ffffff !important;
@@ -76,7 +76,7 @@
   line-height: 1.4 !important;
 }
 
-/* Clean Pulses */
+/* Subtle Pulses */
 @keyframes pulse-ring {
   0% { transform: scale(0.95); opacity: 0.8; }
   50% { transform: scale(1.35); opacity: 0; }
@@ -86,3 +86,4 @@
 .radar-ping {
   animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
+

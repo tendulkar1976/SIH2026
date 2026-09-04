@@ -13,16 +13,13 @@ import {
   BarChart3,
   Bell,
   Settings,
-  Shield,
   Activity,
-  Cpu,
-  Landmark,
   ShieldCheck,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
-  const { stats, alerts, buses } = useUrbanStore();
+  const { stats, buses } = useUrbanStore();
 
   const activeBusesCount = buses.filter((b) => b.is_online).length;
 
@@ -38,7 +35,7 @@ export const Sidebar: React.FC = () => {
       href: '/live',
       icon: Radio,
       badge: 'LIVE',
-      badgeColor: 'bg-pewter-blue/15 text-pewter-darkBlue border-pewter-blue/30 font-bold',
+      badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200 font-bold',
     },
     {
       name: 'GIS Spatial Map',
@@ -58,7 +55,7 @@ export const Sidebar: React.FC = () => {
       href: '/alerts',
       icon: Bell,
       badge: stats.active_alerts > 0 ? `${stats.active_alerts}` : null,
-      badgeColor: 'bg-rose-50 text-rose-600 border-rose-200 font-bold',
+      badgeColor: 'bg-rose-50 text-rose-700 border-rose-200 font-bold',
     },
     {
       name: 'Transit Fleet Nodes',
@@ -87,22 +84,22 @@ export const Sidebar: React.FC = () => {
   }
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 z-30 select-none shadow-clean-sm">
+    <aside className="w-64 bg-white border-r border-slate-200/90 flex flex-col justify-between h-screen sticky top-0 z-30 select-none shadow-clean-sm">
       <div>
         {/* Brand & Gov Emblem */}
-        <div className="p-4 border-b border-slate-200">
+        <div className="p-4 border-b border-slate-100">
           <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pewter-blue to-pewter-darkBlue p-0.5 shadow-clean-sm flex items-center justify-center">
-              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-pewter-darkBlue group-hover:scale-110 transition-transform duration-200" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 p-0.5 shadow-sm flex items-center justify-center">
+              <div className="w-full h-full bg-white rounded-[9px] flex items-center justify-center">
+                <ShieldCheck className="w-5 h-5 text-indigo-600 group-hover:scale-110 transition-transform duration-200" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base tracking-wider text-slate-900">URBANSENSE</span>
+                <span className="font-extrabold text-sm tracking-wider text-slate-900">URBANSENSE</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-semibold">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold">
                 Enterprise Gov AI
               </p>
             </div>
@@ -113,7 +110,7 @@ export const Sidebar: React.FC = () => {
         <nav className="p-3 space-y-1">
           <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center justify-between">
             <span>OPERATIONAL SECTORS</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-pewter-blue" />
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
           </div>
 
           {navigation.map((item) => {
@@ -127,14 +124,14 @@ export const Sidebar: React.FC = () => {
                 href={item.href}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all group relative ${
                   isActive
-                    ? 'bg-pewter-blue/10 text-pewter-darkBlue border border-pewter-blue/30 shadow-clean-sm font-bold'
+                    ? 'bg-indigo-50/80 text-indigo-700 border border-indigo-200/80 shadow-xs font-semibold'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon
                     className={`w-4 h-4 transition-colors ${
-                      isActive ? 'text-pewter-darkBlue' : 'text-slate-400 group-hover:text-slate-700'
+                      isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-700'
                     }`}
                   />
                   <span>{item.name}</span>
@@ -151,7 +148,7 @@ export const Sidebar: React.FC = () => {
                 )}
 
                 {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-pewter-blue rounded-r-full" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-indigo-600 rounded-r-full" />
                 )}
               </Link>
             );
@@ -160,26 +157,27 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Corporate Gov Telemetry Footer */}
-      <div className="p-4 border-t border-slate-200 bg-slate-50">
-        <div className="bg-white p-3 rounded-2xl border border-slate-200 space-y-2 shadow-clean-sm">
+      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+        <div className="bg-white p-3 rounded-2xl border border-slate-200/80 space-y-2 shadow-xs">
           <div className="flex items-center justify-between text-[11px] font-mono">
             <span className="text-slate-700 flex items-center gap-1.5 font-bold">
-              <Activity className="w-3.5 h-3.5 text-pewter-darkBlue" />
+              <Activity className="w-3.5 h-3.5 text-indigo-600" />
               EDGE VISION LINK
             </span>
-            <span className="text-pewter-darkBlue font-extrabold">29.8 FPS</span>
+            <span className="text-indigo-600 font-extrabold">29.8 FPS</span>
           </div>
 
-          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200 p-0.5">
-            <div className="bg-pewter-blue h-full w-[94%] rounded-full shadow-sm" />
+          <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden border border-slate-200">
+            <div className="bg-indigo-600 h-full w-[94%] rounded-full" />
           </div>
 
           <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-0.5">
-            <span>TRANSIT NODES: <strong className="text-slate-900">6 ONLINE</strong></span>
-            <span>LATENCY: <strong className="text-pewter-darkBlue">42ms</strong></span>
+            <span>NODES: <strong className="text-slate-900">6 ONLINE</strong></span>
+            <span>LATENCY: <strong className="text-indigo-600">42ms</strong></span>
           </div>
         </div>
       </div>
     </aside>
   );
 };
+
