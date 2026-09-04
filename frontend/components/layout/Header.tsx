@@ -7,18 +7,13 @@ import { ConnectionIndicator } from '@/components/layout/ConnectionIndicator';
 import {
   Bell,
   Clock,
-  Lock,
-  Activity,
   Shield,
-  Radio,
-  AlertTriangle,
-  Layers,
 } from 'lucide-react';
 import Link from 'next/link';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
-  const { stats, buses } = useUrbanStore();
+  const { stats } = useUrbanStore();
   const [timeOnly, setTimeOnly] = useState<string>('');
   const [dateOnly, setDateOnly] = useState<string>('');
   const [isMounted, setIsMounted] = useState(false);
@@ -61,7 +56,6 @@ export const Header: React.FC = () => {
   };
 
   const meta = getModuleMeta();
-  const onlineBuses = buses.filter((b) => b.is_online).length;
 
   if (pathname === '/login') return null;
 
@@ -98,55 +92,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* ========================================================= */}
-        {/* CENTER: COMPACT LIVE SYSTEM METRICS (MISSION CONTROL HUD) */}
-        {/* ========================================================= */}
-        <div className="hidden xl:flex items-center divide-x divide-slate-200 bg-slate-50 border border-slate-200 rounded-md px-1 py-1 text-xs font-mono shadow-2xs">
-          
-          {/* Metric 1: Fleet Sensor Grid */}
-          <div className="px-3 py-0.5 flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-            <div>
-              <span className="text-[9px] text-slate-400 uppercase tracking-wider block leading-tight">FLEET NODES</span>
-              <span className="text-xs font-bold text-slate-800 leading-tight">
-                {onlineBuses}/{buses.length} ACTIVE
-              </span>
-            </div>
-          </div>
 
-          {/* Metric 2: AI Vision Inference Pipeline */}
-          <div className="px-3 py-0.5 flex items-center gap-2">
-            <Activity className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            <div>
-              <span className="text-[9px] text-slate-400 uppercase tracking-wider block leading-tight">INFERENCE PIPELINE</span>
-              <span className="text-xs font-bold text-slate-800 leading-tight">
-                30.0 FPS <span className="text-slate-400 text-[10px] font-normal">/ 42ms</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Metric 3: Critical Dispatch Queue */}
-          <div className="px-3 py-0.5 flex items-center gap-2">
-            <AlertTriangle className={`w-3.5 h-3.5 shrink-0 ${stats.active_alerts > 0 ? 'text-rose-600 animate-pulse' : 'text-slate-400'}`} />
-            <div>
-              <span className="text-[9px] text-slate-400 uppercase tracking-wider block leading-tight">DISPATCH QUEUE</span>
-              <span className={`text-xs font-bold leading-tight ${stats.active_alerts > 0 ? 'text-rose-700' : 'text-slate-800'}`}>
-                {stats.active_alerts} CRITICAL
-              </span>
-            </div>
-          </div>
-
-          {/* Metric 4: Security Clearance Protocol */}
-          <div className="px-3 py-0.5 flex items-center gap-2">
-            <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-            <div>
-              <span className="text-[9px] text-slate-400 uppercase tracking-wider block leading-tight">SECURITY PROTOCOL</span>
-              <span className="text-xs font-bold text-slate-800 leading-tight">
-                RESTRICTED // L4
-              </span>
-            </div>
-          </div>
-        </div>
 
         {/* ========================================================= */}
         {/* RIGHT: IST CHRONO, STATUS, NOTIFICATIONS, OPERATOR        */}
