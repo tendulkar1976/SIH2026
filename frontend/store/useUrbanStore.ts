@@ -9,9 +9,47 @@ import {
   BusTelemetry,
   AlertItem,
   ConnectionStatus,
+  UserProfile,
+  UserRole,
 } from '@/types';
 import { initialIncidents } from '@/data/mockIncidents';
 import { initialBuses } from '@/data/mockBuses';
+
+export const AUTHORITY_PROFILES: Record<UserRole, UserProfile> = {
+  admin: {
+    id: 'usr-admin-01',
+    name: 'CMDR. R. MENON',
+    initials: 'RM',
+    role: 'admin',
+    roleTitle: 'Joint Command Director',
+    badgeId: '#MC-904',
+    department: 'Civic Command & Urban Intelligence',
+    clearanceLevel: 'Level 5 (Full Access)',
+    email: 'r.menon@urbansense.gov.in',
+  },
+  traffic_authority: {
+    id: 'usr-traffic-02',
+    name: 'ACP V. SHARMA',
+    initials: 'VS',
+    role: 'traffic_authority',
+    roleTitle: 'Traffic Enforcement Officer',
+    badgeId: '#BTP-412',
+    department: 'Bangalore Traffic Police (TMC)',
+    clearanceLevel: 'Level 4 (Traffic & ANPR)',
+    email: 'v.sharma@btp.gov.in',
+  },
+  municipal_authority: {
+    id: 'usr-municipal-03',
+    name: 'ENG. K. PRIYA',
+    initials: 'KP',
+    role: 'municipal_authority',
+    roleTitle: 'Chief Infrastructure Engineer',
+    badgeId: '#BBMP-780',
+    department: 'Public Works Department (PWD & BBMP)',
+    clearanceLevel: 'Level 4 (Roads & Drainage)',
+    email: 'k.priya@bbmp.gov.in',
+  },
+};
 
 interface FilterState {
   type: string;
@@ -24,6 +62,9 @@ interface FilterState {
 }
 
 interface UrbanState {
+  currentUser: UserProfile;
+  isAuthenticated: boolean;
+  registeredUsers: UserProfile[];
   incidents: IncidentEvent[];
   stats: DashboardStats;
   buses: BusTelemetry[];
@@ -34,6 +75,13 @@ interface UrbanState {
   isDemoMode: boolean;
   simulationSpeed: number; // 1, 2, 5, 0 (paused)
   filter: FilterState;
+
+  // User Actions
+  setCurrentUser: (user: UserProfile) => void;
+  switchRole: (role: UserRole) => void;
+  registerOfficer: (officer: Omit<UserProfile, 'id' | 'initials'>) => void;
+  login: (user: UserProfile) => void;
+  logout: () => void;
 
   // Actions
   addIncident: (event: IncidentEvent) => void;
@@ -122,6 +170,9 @@ const initialAlertsList: AlertItem[] = initialIncidents
   }));
 
 export const useUrbanStore = create<UrbanState>((set, get) => ({
+  currentUser: AUTHORITY_PROFILES.admin,
+  isAuthenticated: true,
+  registeredUsers: Object.values(AUTHORITY_PROFILES),
   incidents: initialIncidents,
   stats: computeInitialStats(initialIncidents),
   buses: initialBuses,
@@ -140,6 +191,42 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
     dateRange: 'all',
     search: '',
   },
+
+  setCurrentUser: (user: UserProfile) => set({ currentUser: user, isAuthenticated: true }),
+  
+  switchRole: (role: UserRole) => {
+    const profile = AUTHORITY_PROFILES[role];
+    if (profile) {
+      set({ currentUser: profile, isAuthenticated: true });
+    }
+  },
+
+  registerOfficer: (officer: Omit<UserProfile, 'id' | 'initials'>) => {
+    const initials =
+      officer.name
+        .split(' ')
+        .filter(Boolean)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2) || 'OF';
+
+    const newProfile: UserProfile = {
+      ...officer,
+      id: `usr-${Date.now()}`,
+      initials,
+    };
+
+    set((state) => ({
+      registeredUsers: [newProfile, ...state.registeredUsers],
+      currentUser: newProfile,
+      isAuthenticated: true,
+    }));
+  },
+
+  login: (user: UserProfile) => set({ currentUser: user, isAuthenticated: true }),
+
+  logout: () => set({ isAuthenticated: false }),
 
   addIncident: (event: IncidentEvent) => {
     set((state) => {

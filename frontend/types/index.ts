@@ -247,3 +247,18 @@ export interface CivicReportSummary {
   status: 'ready' | 'archived';
   file_size_kb: number;
 }
+
+// User Profile & Roles
+export type UserRole = 'admin' | 'traffic_authority' | 'municipal_authority';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  initials: string;
+  role: UserRole;
+  roleTitle: string;
+  badgeId: string;
+  department: string;
+  clearanceLevel: string;
+  email: string;
+}

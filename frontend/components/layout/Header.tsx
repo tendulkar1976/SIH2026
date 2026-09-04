@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUrbanStore } from '@/store/useUrbanStore';
 import { ConnectionIndicator } from '@/components/layout/ConnectionIndicator';
+import { UserProfileMenu } from '@/components/layout/UserProfileMenu';
 import {
   Bell,
   Clock,
@@ -127,17 +128,9 @@ export const Header: React.FC = () => {
             )}
           </Link>
 
-          {/* Duty Officer Profile Box */}
-          <div className="flex items-center gap-2 pl-2 sm:pl-2.5 border-l border-slate-200">
-            <div className="w-8 h-8 rounded-md bg-slate-900 border border-slate-800 flex items-center justify-center text-white font-mono font-bold text-xs shadow-2xs">
-              RM
-            </div>
-            <div className="hidden lg:block text-left font-mono">
-              <div className="text-xs font-bold text-slate-900 leading-tight">CMDR. R. MENON</div>
-              <div className="text-[9px] text-indigo-600 font-bold uppercase tracking-wider">
-                CIVIC COMMAND // #MC-904
-              </div>
-            </div>
+          {/* Interactive User Profile & Authority Switcher */}
+          <div className="pl-1 sm:pl-2 border-l border-slate-200">
+            <UserProfileMenu />
           </div>
 
         </div>
