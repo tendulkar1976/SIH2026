@@ -15,54 +15,28 @@ import {
 import { TrendingUp } from 'lucide-react';
 
 export const IncidentTrendChart: React.FC = () => {
-  const [period, setPeriod] = useState<'today' | '7d' | '30d'>('today');
-  const data = trendDataByPeriod[period];
-
-  const getPeriodLabel = () => {
-    switch (period) {
-      case 'today':
-        return 'Today (Hourly Anomaly Profile)';
-      case '7d':
-        return 'Last 7 Days (Daily Cumulative)';
-      case '30d':
-        return 'Last 30 Days (Weekly Trajectory)';
-    }
-  };
+  const data = trendDataByPeriod['today'];
 
   return (
     <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-clean-card flex flex-col justify-between h-full space-y-4">
-      {/* Header with period toggle */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 tracking-tight">Incident Occurrence Timeline</h3>
-            <p className="text-[11px] font-mono text-slate-500">{getPeriodLabel()}</p>
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight">24-Hour Anomaly Distribution Profile</h3>
+            <p className="text-[11px] font-mono text-slate-500">Real-time hourly hazard density across monitored sectors</p>
           </div>
         </div>
 
-        {/* Period Switcher */}
-        <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 self-start sm:self-auto">
-          {[
-            { id: 'today' as const, label: 'Today' },
-            { id: '7d' as const, label: '7 Days' },
-            { id: '30d' as const, label: '30 Days' },
-          ].map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setPeriod(p.id)}
-              className={`px-3 py-1 rounded-lg text-xs font-mono transition ${
-                period === p.id
-                  ? 'bg-white text-indigo-700 font-bold border border-slate-200 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+        <a
+          href="/analytics"
+          className="text-xs font-mono text-indigo-600 hover:text-indigo-700 font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-100 transition"
+        >
+          Historical Trends →
+        </a>
       </div>
 
       {/* Chart Canvas */}
