@@ -14,6 +14,9 @@ import {
   Crown,
   ShieldAlert,
   Building2,
+  Construction,
+  Car,
+  BarChart3,
   CheckCircle2,
   Sparkles,
   BadgeAlert,
@@ -170,7 +173,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen -m-6 md:-m-8 bg-[#f5f8fc] text-slate-800 relative overflow-hidden flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 font-sans">
       
-      {/* 1. Background City Bus Graphic (BMTC Electric Bus) across lower left */}
+      {/* 1. Background BMTC Electric Bus across lower-left */}
       <div className="absolute bottom-0 left-0 w-full lg:w-[62%] h-[55%] lg:h-[68%] pointer-events-none -z-0">
         <Image
           src="/images/bmtc_bus.jpg"
@@ -183,7 +186,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#f5f8fc]/30 to-[#f5f8fc]" />
       </div>
 
-      {/* Atmospheric ambient glow */}
+      {/* Atmospheric glow shapes */}
       <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-blue-300/10 rounded-full blur-[120px] pointer-events-none -z-0" />
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[400px] bg-sky-200/15 rounded-full blur-[140px] pointer-events-none -z-0" />
 
@@ -194,14 +197,14 @@ export default function LoginPage() {
         </span>
       </header>
 
-      {/* 3. Main Split Screen Body - Vertically Centered */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-14 my-auto py-4">
+      {/* 3. Main Split Screen Body */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 my-auto py-2">
         
-        {/* LEFT HERO SECTION (52%) - Centered Vertically */}
-        <div className="w-full lg:w-[52%] flex flex-col justify-center space-y-6 my-auto">
+        {/* LEFT HERO SECTION (52%) */}
+        <div className="w-full lg:w-[52%] flex flex-col justify-center space-y-5 my-auto">
           
           {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 backdrop-blur-xs border border-blue-200/90 text-blue-700 text-xs font-mono font-bold uppercase tracking-wider w-fit shadow-2xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50/90 backdrop-blur-xs border border-blue-200/90 text-blue-700 text-xs font-mono font-bold uppercase tracking-wider w-fit shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             <span>MUNICIPAL URBAN INTELLIGENCE PLATFORM</span>
           </div>
@@ -217,9 +220,58 @@ export default function LoginPage() {
             Transforming public transport into mobile urban sensing units for safer roads, efficient infrastructure and a better tomorrow.
           </p>
 
+          {/* 4 Feature Highlights */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl pt-1">
+            
+            {/* Feature 1 */}
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
+                <Construction className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Detect</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Road Issues</div>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+                <Car className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Monitor</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Traffic</div>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Enhance</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Public Safety</div>
+              </div>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
+                <BarChart3 className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Enable</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Data-Driven Decisions</div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
 
-        {/* RIGHT LOGIN CARD (48%) - Vertically Centered with Equal Padding */}
+        {/* RIGHT LOGIN CARD (48%) */}
         <div className="w-full lg:w-[48%] max-w-[480px] my-auto">
           
           {notice && (
@@ -236,7 +288,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Authentication Card */}
+          {/* Authentication Card matching screenshot exactly */}
           <div className="bg-white/95 backdrop-blur-md p-8 rounded-[2rem] border border-slate-200/90 shadow-2xl shadow-blue-100/60 space-y-4">
             
             {/* Top Shield Emblem */}
@@ -301,7 +353,7 @@ export default function LoginPage() {
                         id: 'traffic_authority' as const,
                         label: 'Traffic Authority',
                         desc: 'Traffic Police & TMC',
-                        icon: ShieldAlert,
+                        icon: Shield,
                       },
                       {
                         id: 'municipal_authority' as const,
@@ -532,6 +584,7 @@ export default function LoginPage() {
           <span className="font-semibold tracking-wider">PEOPLE &nbsp;|&nbsp; PLACES &nbsp;|&nbsp; PROGRESS</span>
         </div>
         <div className="flex flex-col text-right text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase leading-tight">
+          <div className="w-6 h-0.5 bg-slate-300 ml-auto mb-1 rounded-full"></div>
           <span>CLEANER</span>
           <span>SAFER</span>
           <span>SMARTER</span>
