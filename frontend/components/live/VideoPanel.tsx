@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { BusTelemetry } from '@/types';
 import { DetectionOverlay } from '@/components/live/DetectionOverlay';
 import { CameraStatusBadge } from '@/components/live/CameraStatusBadge';
+import { useUrbanStore } from '@/store/useUrbanStore';
+import { webrtcReceiver } from '@/services/webrtc';
 import Image from 'next/image';
 import {
   Play,
@@ -16,6 +18,9 @@ import {
   AlertTriangle,
   RotateCcw,
   Sparkles,
+  Smartphone,
+  Radio,
+  Tv,
 } from 'lucide-react';
 
 interface VideoPanelProps {
@@ -24,32 +29,68 @@ interface VideoPanelProps {
 
 const DEMO_STREAMS = [
   {
-    id: 'ai_vision_night',
-    name: 'Edge AI YOLOv10 Inferences (Night Traffic)',
-    url: '/images/live_detection_feed.png',
-    isImage: true,
-  },
-  {
     id: 'highway_night',
-    name: 'Corridor Stream Alpha (Live Video)',
+    name: 'Live Corridor Video Stream',
     url: 'https://assets.mixkit.co/videos/preview/mixkit-traffic-on-a-busy-highway-at-night-42436-large.mp4',
     isImage: false,
   },
   {
+    id: 'ai_vision_night',
+    name: 'Edge AI YOLOv10 Inferences (Snapshot)',
+    url: '/images/live_detection_feed.png',
+    isImage: true,
+  },
+  {
     id: 'urban_day',
-    name: 'Expressway Stream Beta (Urban Transit)',
+    name: 'Expressway Stream Beta',
     url: 'https://assets.mixkit.co/videos/preview/mixkit-daytime-traffic-on-a-busy-avenue-42438-large.mp4',
     isImage: false,
   },
 ];
 
 export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
+  const {
+    edgeDeviceId,
+    isRealPhoneConnected,
+    edgeStatus,
+    livePhoneFps,
+    livePhoneLatency,
+    setRealPhoneConnected,
+  } = useUrbanStore();
+
   const [isPlaying, setIsPlaying] = useState(true);
   const [showDetections, setShowDetections] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentStream, setCurrentStream] = useState(DEMO_STREAMS[0]);
+  const [hasRemoteMediaStream, setHasRemoteMediaStream] = useState(false);
   const [customStreamNotice, setCustomStreamNotice] = useState<string | null>(null);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // WebRTC remote stream listener
+  useEffect(() => {
+    const unsub = webrtcReceiver.onStream((stream) => {
+      console.log('[VideoPanel] Hooked remote WebRTC MediaStream to video element');
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play().catch((e) => console.warn('Autoplay prevented:', e));
+      }
+      setHasRemoteMediaStream(true);
+      setRealPhoneConnected(true);
+    });
+
+    const existingStream = webrtcReceiver.getStream();
+    if (existingStream && existingStream.getTracks().length > 0 && videoRef.current) {
+      videoRef.current.srcObject = existingStream;
+      videoRef.current.play().catch(() => {});
+      setHasRemoteMediaStream(true);
+    }
+
+    return () => {
+      unsub();
+    };
+  }, [setRealPhoneConnected]);
 
   const handleCustomUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -72,7 +113,7 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
   };
 
   // Render camera status fallback screens
-  if (bus.camera_status === 'OFFLINE') {
+  if (bus.camera_status === 'OFFLINE' && !isRealPhoneConnected && edgeStatus === 'DISCONNECTED') {
     return (
       <div className="bg-white aspect-video rounded-xl border border-slate-200/80 flex flex-col items-center justify-center p-8 text-center space-y-4 shadow-clean-card">
         <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
@@ -82,14 +123,14 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
           <CameraStatusBadge status="OFFLINE" size="lg" />
           <h3 className="text-sm font-bold text-slate-900 font-mono mt-2">{bus.bus_id} Camera Standby</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Optical edge sensor unit is powered down or in low-power depot maintenance mode.
+            Waiting for {edgeDeviceId} to connect or open pairing code...
           </p>
         </div>
       </div>
     );
   }
 
-  if (bus.camera_status === 'CONNECTING') {
+  if (bus.camera_status === 'CONNECTING' && edgeStatus === 'CONNECTING') {
     return (
       <div className="bg-white aspect-video rounded-xl border border-amber-200 flex flex-col items-center justify-center p-8 text-center space-y-4 shadow-clean-card">
         <div className="w-14 h-14 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 animate-spin">
@@ -97,31 +138,16 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
         </div>
         <div className="space-y-1">
           <CameraStatusBadge status="CONNECTING" size="lg" />
-          <h3 className="text-sm font-bold text-slate-900 font-mono mt-2">Negotiating Optical RTSP Stream</h3>
+          <h3 className="text-sm font-bold text-slate-900 font-mono mt-2">Negotiating WebRTC Link</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Establishing WebRTC/HLS link to {bus.bus_id} Edge Optical Unit...
+            Connecting to {edgeDeviceId} (&quot;Bus Sensing SmartCam&quot;)...
           </p>
         </div>
       </div>
     );
   }
 
-  if (bus.camera_status === 'ERROR') {
-    return (
-      <div className="bg-white aspect-video rounded-xl border border-rose-200 flex flex-col items-center justify-center p-8 text-center space-y-4 shadow-clean-card">
-        <div className="w-14 h-14 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 animate-pulse">
-          <AlertTriangle className="w-7 h-7" />
-        </div>
-        <div className="space-y-1">
-          <CameraStatusBadge status="ERROR" size="lg" />
-          <h3 className="text-sm font-bold text-slate-900 font-mono mt-2">Optical Stream Link Error (Code 502)</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Sensor lens occlusion, hardware driver fault, or network packet drops detected on {bus.bus_id}.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const isLiveDevice = isRealPhoneConnected || hasRemoteMediaStream;
 
   return (
     <div
@@ -140,60 +166,92 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
 
       {/* Main Stream Canvas */}
       <div className="relative w-full h-full bg-slate-950 overflow-hidden flex items-center justify-center">
-        {currentStream.isImage ? (
-          /* High-Resolution Computer Vision Detection Frame */
-          <div className="relative w-full h-full">
-            <Image
-              src={currentStream.url}
-              alt="Live Computer Vision Inferences"
-              fill
-              priority
-              className={`object-cover object-center transition-opacity duration-300 ${
-                isPlaying ? 'opacity-100' : 'opacity-50'
-              }`}
-            />
-            {/* Real-time scanning line when playing */}
-            {isPlaying && (
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.8)] animate-pulse" />
+        {/* Real Phone WebRTC Stream Element */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            isLiveDevice ? 'block opacity-95' : 'hidden'
+          }`}
+        />
+
+        {/* Fallback Demo Stream when not in WebRTC mode */}
+        {!isLiveDevice && (
+          <>
+            {currentStream.isImage ? (
+              <div className="relative w-full h-full">
+                <Image
+                  src={currentStream.url}
+                  alt="Live Computer Vision Inferences"
+                  fill
+                  priority
+                  className={`object-cover object-center transition-opacity duration-300 ${
+                    isPlaying ? 'opacity-100' : 'opacity-50'
+                  }`}
+                />
+                {isPlaying && (
+                  <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.8)] animate-pulse" />
+                  </div>
+                )}
               </div>
+            ) : (
+              <video
+                key={currentStream.url}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  isPlaying ? 'opacity-95' : 'opacity-40'
+                }`}
+                src={currentStream.url}
+              />
             )}
-          </div>
-        ) : (
-          /* Live Video Stream */
-          <video
-            key={currentStream.url}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
-              isPlaying ? 'opacity-95' : 'opacity-40'
-            }`}
-            src={currentStream.url}
-          />
+          </>
         )}
 
-        {/* Real-time AI Overlays for video mode */}
-        {!currentStream.isImage && showDetections && isPlaying && (
+        {/* Real-time AI Overlays (Bounding Boxes + Confidence + Labels) */}
+        {showDetections && isPlaying && (
           <DetectionOverlay detections={bus.detections_in_frame} />
         )}
 
         {/* Top Watermark / Status Bar */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-20 pointer-events-none">
           <div className="flex items-center gap-2">
-            <div className="px-2.5 py-1 rounded-md bg-slate-900/90 backdrop-blur-md border border-slate-700/60 text-xs font-mono font-bold text-white flex items-center gap-2 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span>{bus.bus_id}</span>
+            {/* Live Device vs Demo Device Badge */}
+            {isLiveDevice ? (
+              <div className="px-2.5 py-1 rounded-md bg-emerald-950/90 backdrop-blur-md border border-emerald-500/70 text-xs font-mono font-bold text-emerald-300 flex items-center gap-2 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span>LIVE DEVICE</span>
+                <span className="text-white text-[11px]">({edgeDeviceId})</span>
+              </div>
+            ) : (
+              <div className="px-2.5 py-1 rounded-md bg-slate-900/90 backdrop-blur-md border border-amber-500/50 text-xs font-mono font-bold text-amber-300 flex items-center gap-2 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span>DEMO DEVICE</span>
+                <span className="text-slate-300 text-[11px]">({bus.bus_id})</span>
+              </div>
+            )}
+
+            <div className="px-2.5 py-1 rounded-md bg-slate-900/90 backdrop-blur-md border border-slate-700/60 text-xs font-mono font-bold text-white flex items-center gap-1.5 shadow-sm">
               <span className="text-cyan-400">ROUTE {bus.route_id}</span>
             </div>
 
-            <CameraStatusBadge status={bus.camera_status} fps={bus.fps} size="sm" />
+            <CameraStatusBadge
+              status={bus.camera_status}
+              fps={isLiveDevice ? livePhoneFps : bus.fps}
+              size="sm"
+            />
           </div>
 
           <div className="px-2.5 py-1 rounded-md bg-slate-900/90 backdrop-blur-md border border-slate-700/60 text-[10px] font-mono text-slate-300 shadow-sm flex items-center gap-1.5">
             <Sparkles className="w-3 h-3 text-cyan-400" />
-            <span>{new Date().toLocaleTimeString()} IST | {bus.latency_ms}ms</span>
+            <span>
+              {new Date().toLocaleTimeString()} IST | {isLiveDevice ? livePhoneLatency : bus.latency_ms}ms
+            </span>
           </div>
         </div>
 
@@ -229,21 +287,31 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
               <span>AI HUD</span>
             </button>
 
-            {/* Stream Selector */}
-            <select
-              value={currentStream.id}
-              onChange={(e) => {
-                const s = DEMO_STREAMS.find((item) => item.id === e.target.value);
-                if (s) setCurrentStream(s);
-              }}
-              className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1 text-[11px] font-mono text-slate-200 focus:outline-none focus:border-blue-500"
-            >
-              {DEMO_STREAMS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            {/* Stream Selector (Available in Demo Mode) */}
+            {!isLiveDevice && (
+              <select
+                value={currentStream.id}
+                onChange={(e) => {
+                  const s = DEMO_STREAMS.find((item) => item.id === e.target.value);
+                  if (s) setCurrentStream(s);
+                }}
+                className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1 text-[11px] font-mono text-slate-200 focus:outline-none focus:border-blue-500"
+              >
+                {DEMO_STREAMS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Device Mode Status */}
+            {isLiveDevice && (
+              <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400 px-2 py-0.5 bg-emerald-950/60 rounded border border-emerald-800">
+                <Radio className="w-3 h-3 animate-pulse" />
+                <span>WebRTC Live Link</span>
+              </span>
+            )}
 
             {/* Custom Video/Image Upload */}
             <button
@@ -268,4 +336,3 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
     </div>
   );
 };
-

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useUrbanStore } from '@/store/useUrbanStore';
 import { FleetCard } from '@/components/fleet/FleetCard';
 import { BusDetailModal } from '@/components/fleet/BusDetailModal';
+import { ConnectDeviceModal } from '@/components/fleet/ConnectDeviceModal';
 import { BusTelemetry, BusStatus } from '@/types';
 import {
   Bus,
@@ -11,7 +12,8 @@ import {
 } from 'lucide-react';
 
 export default function FleetPage() {
-  const { buses } = useUrbanStore();
+  const { buses, connectModalOpen, setConnectModalOpen, selectedBusId } = useUrbanStore();
+  const selectedBus = buses.find((b) => b.bus_id === selectedBusId) || buses[0];
   const [selectedBusForModal, setSelectedBusForModal] = useState<BusTelemetry | null>(null);
   const [statusFilter, setStatusFilter] = useState<'ALL' | BusStatus>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -147,6 +149,14 @@ export default function FleetPage() {
       <BusDetailModal
         bus={selectedBusForModal}
         onClose={() => setSelectedBusForModal(null)}
+      />
+
+      {/* Connect Edge Vision Device Modal */}
+      <ConnectDeviceModal
+        isOpen={connectModalOpen}
+        onClose={() => setConnectModalOpen(false)}
+        busId={selectedBus?.bus_id || 'BUS-102'}
+        routeId={selectedBus?.route_id || 'R-12'}
       />
     </div>
   );

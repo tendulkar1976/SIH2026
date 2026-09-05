@@ -7,6 +7,9 @@ import {
   DepartmentType,
   DashboardStats,
   BusTelemetry,
+  BusStatus,
+  CameraStatus,
+  LiveDetection,
   AlertItem,
   ConnectionStatus,
   UserProfile,
@@ -75,7 +78,53 @@ interface UrbanState {
   connectionStatus: ConnectionStatus;
   isDemoMode: boolean;
   simulationSpeed: number; // 1, 2, 5, 0 (paused)
+  // Edge Device & Bus Sensing SmartCam State
+  edgeDeviceId: string;
+  pairingCode: string;
+  edgeStatus: 'DISCONNECTED' | 'CONNECTING' | 'DEVICE_CONNECTED' | 'CAMERA_READY' | 'AI_CONNECTED' | 'STREAM_READY' | 'LIVE';
+  isRealPhoneConnected: boolean;
+  livePhoneFps: number;
+  livePhoneLatency: number;
+  livePhoneStream: MediaStream | null;
+  connectModalOpen: boolean;
+  latestEdgeDetection: {
+    type: string;
+    confidence: number;
+    severity: string;
+    timestamp: string;
+    bbox?: [number, number, number, number];
+  } | null;
+  detectionHistory: Array<{
+    id: string;
+    time: string;
+    detection: string;
+    confidence: number;
+    location: string;
+    severity: string;
+  }>;
   filter: FilterState;
+
+  // Edge Device Actions
+  setEdgeStatus: (status: UrbanState['edgeStatus']) => void;
+  setRealPhoneConnected: (connected: boolean) => void;
+  setConnectModalOpen: (open: boolean) => void;
+  setLivePhoneStream: (stream: MediaStream | null) => void;
+  recordEdgeDetection: (detection: {
+    type: string;
+    confidence: number;
+    severity: string;
+    timestamp?: string;
+    bbox?: [number, number, number, number];
+    location?: string;
+    busId?: string;
+  }) => void;
+  updateEdgeTelemetry: (data: {
+    latitude?: number;
+    longitude?: number;
+    speed?: number;
+    fps?: number;
+    latencyMs?: number;
+  }) => void;
 
   // User Actions
   setCurrentUser: (user: UserProfile) => void;
@@ -184,6 +233,181 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
   connectionStatus: 'LIVE',
   isDemoMode: false,
   simulationSpeed: 1,
+  // Edge Device Initial State
+  edgeDeviceId: 'BUS-NODE-#1042',
+  pairingCode: '1042-7821',
+  edgeStatus: 'DISCONNECTED',
+  isRealPhoneConnected: false,
+  livePhoneFps: 30.0,
+  livePhoneLatency: 45,
+  livePhoneStream: null,
+  connectModalOpen: false,
+  latestEdgeDetection: {
+    type: 'Pothole',
+    confidence: 0.94,
+    severity: 'High',
+    timestamp: new Date().toISOString(),
+    bbox: [22, 35, 38, 28],
+  },
+  detectionHistory: [
+    {
+      id: 'DH-1',
+      time: '12:44:12',
+      detection: 'Person',
+      confidence: 0.82,
+      location: 'Koramangala 80ft Road',
+      severity: 'Medium',
+    },
+    {
+      id: 'DH-2',
+      time: '12:43:50',
+      detection: 'Pothole',
+      confidence: 0.94,
+      location: 'Hosur Main Road',
+      severity: 'High',
+    },
+    {
+      id: 'DH-3',
+      time: '12:41:20',
+      detection: 'Wrong Way Vehicle',
+      confidence: 0.96,
+      location: 'Silk Board Flyover Approach',
+      severity: 'Critical',
+    },
+    {
+      id: 'DH-4',
+      time: '12:38:05',
+      detection: 'Missing Zebra Crossing',
+      confidence: 0.89,
+      location: 'Sony World Signal',
+      severity: 'Medium',
+    },
+    {
+      id: 'DH-5',
+      time: '12:35:18',
+      detection: 'Rash Driving',
+      confidence: 0.91,
+      location: 'St. John\'s Hospital Junction',
+      severity: 'High',
+    },
+  ],
+
+  setEdgeStatus: (status) =>
+    set((state) => {
+      const isLive = status === 'LIVE' || status === 'STREAM_READY';
+      const camStatus: CameraStatus = isLive ? 'LIVE' : status === 'CONNECTING' ? 'CONNECTING' : 'OFFLINE';
+      const updatedBuses = state.buses.map((bus) =>
+        bus.bus_id === 'BUS-102'
+          ? {
+              ...bus,
+              camera_status: camStatus,
+            }
+          : bus
+      );
+      return { edgeStatus: status, buses: updatedBuses };
+    }),
+
+  setRealPhoneConnected: (connected) =>
+    set((state) => {
+      const updatedBuses = state.buses.map((bus) =>
+        bus.bus_id === 'BUS-102'
+          ? {
+              ...bus,
+              is_online: connected ? true : bus.is_online,
+              status: (connected ? 'ONLINE' : bus.status) as BusStatus,
+              camera_status: (connected ? 'LIVE' : bus.camera_status) as CameraStatus,
+            }
+          : bus
+      );
+      return {
+        isRealPhoneConnected: connected,
+        edgeStatus: connected ? 'LIVE' : 'DISCONNECTED',
+        buses: updatedBuses,
+      };
+    }),
+
+  setConnectModalOpen: (open) => set({ connectModalOpen: open }),
+
+  setLivePhoneStream: (stream) => set({ livePhoneStream: stream }),
+
+  recordEdgeDetection: (det) =>
+    set((state) => {
+      const newDet = {
+        type: det.type,
+        confidence: det.confidence,
+        severity: det.severity,
+        timestamp: det.timestamp || new Date().toISOString(),
+        bbox: det.bbox || [20, 30, 40, 30] as [number, number, number, number],
+      };
+
+      const historyItem = {
+        id: `DH-${Date.now()}`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        detection: det.type,
+        confidence: det.confidence,
+        location: det.location || 'Route R-12 Corridor',
+        severity: det.severity,
+      };
+
+      const classLabel: LiveDetection['class_label'] = det.type.toLowerCase().includes('pothole')
+        ? 'pothole'
+        : det.type.toLowerCase().includes('person') || det.type.toLowerCase().includes('pedestrian')
+        ? 'pedestrian'
+        : det.type.toLowerCase().includes('zebra')
+        ? 'zebra_crossing'
+        : 'car';
+
+      const updatedBuses = state.buses.map((bus) =>
+        bus.bus_id === (det.busId || 'BUS-102')
+          ? {
+              ...bus,
+              incidents_today: bus.incidents_today + 1,
+              detections_in_frame: [
+                {
+                  id: `det-${Date.now()}`,
+                  class_label: classLabel,
+                  confidence: det.confidence,
+                  track_id: Math.floor(10 + Math.random() * 89),
+                  bbox: (det.bbox || [25, 30, 35, 30]) as [number, number, number, number],
+                  name: `${det.type} (${(det.confidence * 100).toFixed(0)}%)`,
+                  is_alert: det.severity === 'High' || det.severity === 'Critical',
+                },
+              ],
+            }
+          : bus
+      );
+
+      return {
+        latestEdgeDetection: newDet,
+        detectionHistory: [historyItem, ...state.detectionHistory].slice(0, 30),
+        buses: updatedBuses,
+      };
+    }),
+
+  updateEdgeTelemetry: (data) =>
+    set((state) => {
+      const updatedBuses = state.buses.map((bus) => {
+        if (bus.bus_id === 'BUS-102') {
+          return {
+            ...bus,
+            current_latitude: data.latitude ?? bus.current_latitude,
+            current_longitude: data.longitude ?? bus.current_longitude,
+            speed_kmh: data.speed !== undefined ? Math.round(data.speed) : bus.speed_kmh,
+            fps: data.fps !== undefined ? parseFloat(data.fps.toFixed(1)) : bus.fps,
+            latency_ms: data.latencyMs ?? bus.latency_ms,
+            last_update: new Date().toISOString(),
+          };
+        }
+        return bus;
+      });
+
+      return {
+        livePhoneFps: data.fps !== undefined ? data.fps : state.livePhoneFps,
+        livePhoneLatency: data.latencyMs !== undefined ? data.latencyMs : state.livePhoneLatency,
+        buses: updatedBuses,
+      };
+    }),
+
   filter: {
     type: 'all',
     severity: 'all',

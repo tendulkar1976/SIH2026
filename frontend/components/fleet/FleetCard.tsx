@@ -17,13 +17,13 @@ interface FleetCardProps {
 }
 
 export const FleetCard: React.FC<FleetCardProps> = ({ bus, onSelect }) => {
-  const { setSelectedBusId } = useUrbanStore();
+  const { setSelectedBusId, setConnectModalOpen } = useUrbanStore();
   const router = useRouter();
 
   const handleMonitor = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedBusId(bus.bus_id);
-    router.push('/live');
+    setConnectModalOpen(true);
   };
 
   const getStatusBadge = () => {

@@ -1,5 +1,6 @@
 import { IncidentEvent, ConnectionStatus } from '@/types';
 import { useUrbanStore } from '@/store/useUrbanStore';
+import { webrtcReceiver } from '@/services/webrtc';
 
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws/events';
 
@@ -38,9 +39,63 @@ class RealtimeService {
         this.stopSimulation();
       };
 
-      this.socket.onmessage = (messageEvent) => {
+      this.socket.onmessage = async (messageEvent) => {
         try {
           const payload = JSON.parse(messageEvent.data);
+          const store = useUrbanStore.getState();
+
+          // 1. Edge Device Connection Broadcast
+          if (payload.type === 'device_connected') {
+            console.log('[Realtime] Device connected:', payload.deviceId);
+            store.setRealPhoneConnected(true);
+            store.setEdgeStatus('STREAM_READY');
+          }
+
+          // 2. Camera & Sensor Status Broadcast
+          if (payload.type === 'camera_status') {
+            if (payload.cameraStatus === 'LIVE') {
+              store.setEdgeStatus('LIVE');
+            }
+            store.updateEdgeTelemetry({
+              fps: payload.fps,
+              latencyMs: payload.latencyMs,
+            });
+          }
+
+          // 3. Real-time GPS Telemetry
+          if (payload.type === 'gps_update') {
+            store.updateEdgeTelemetry({
+              latitude: payload.latitude,
+              longitude: payload.longitude,
+              speed: payload.speed,
+              fps: payload.fps,
+            });
+          }
+
+          // 4. Real-time AI Detections from Phone
+          if (payload.type === 'detection') {
+            store.recordEdgeDetection({
+              type: payload.detectionType || payload.type || 'Pothole',
+              confidence: payload.confidence ?? 0.94,
+              severity: payload.severity || 'High',
+              timestamp: payload.timestamp,
+              bbox: payload.bbox,
+              busId: payload.busId || 'BUS-102',
+            });
+          }
+
+          // 5. WebRTC SDP Offer from Phone Camera
+          if (payload.type === 'webrtc_offer' && payload.sdp) {
+            console.log('[Realtime] Received WebRTC offer for device:', payload.deviceId);
+            await webrtcReceiver.handleRemoteOffer(payload.sdp);
+          }
+
+          // 6. WebRTC ICE Candidate from Phone
+          if (payload.type === 'webrtc_ice' && payload.candidate && payload.role === 'sender') {
+            await webrtcReceiver.addIceCandidate(payload.candidate);
+          }
+
+          // 7. General Incident Events
           const eventItem = payload?.data || payload;
           if (eventItem && (eventItem.id || eventItem.incident_id)) {
             const mappedEvent: IncidentEvent = {

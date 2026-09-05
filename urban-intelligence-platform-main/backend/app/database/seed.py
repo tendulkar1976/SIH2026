@@ -66,6 +66,18 @@ def seed_database(db: Session):
             ))
         db.commit()
 
+    # 3.1 Seed Edge Devices if empty
+    if db.query(Device).count() == 0:
+        db.add(Device(
+            id="BUS-NODE-#1042",
+            device_identifier="BUS-NODE-#1042",
+            name="Bus Sensing SmartCam (BUS-102 Edge Vision)",
+            device_type="Android Edge Vision AI Node",
+            bus_id="BUS-102",
+            is_active=True
+        ))
+        db.commit()
+
     # 4. Seed Incidents if empty
     if db.query(Incident).count() == 0:
         now = datetime.now(timezone.utc)

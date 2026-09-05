@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import events, incidents, alerts, websockets, auth, analytics, map, dashboard, registry, recordings
+from app.api import events, incidents, alerts, websockets, auth, analytics, map, dashboard, registry, recordings, devices, webrtc
 from app.database.core import Base, engine
 from app.database.deps import get_db
 import app.models.events
@@ -45,6 +45,9 @@ app.include_router(alerts.router)
 app.include_router(websockets.router)
 app.include_router(registry.router)
 app.include_router(recordings.router)
+app.include_router(devices.router)
+app.include_router(devices.telemetry_router)
+app.include_router(webrtc.router)
 
 @app.get("/health")
 def health_check():
