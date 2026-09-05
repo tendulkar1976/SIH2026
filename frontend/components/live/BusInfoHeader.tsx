@@ -43,22 +43,13 @@ export const BusInfoHeader: React.FC<BusInfoHeaderProps> = ({ bus }) => {
           </div>
         </div>
 
-        {/* Bus Selector Pills */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-mono text-slate-400 mr-1">Switch Node:</span>
-          {buses.map((b) => (
-            <button
-              key={b.bus_id}
-              onClick={() => setSelectedBusId(b.bus_id)}
-              className={`px-3 py-1 rounded-lg text-xs font-mono transition ${
-                bus.bus_id === b.bus_id
-                  ? 'bg-pewter-blue text-white font-semibold shadow-sm'
-                  : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              {b.bus_id}
-            </button>
-          ))}
+        {/* Single Active Bus Node Pill */}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono text-slate-400 font-semibold">Active Node:</span>
+          <span className="px-3 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-600 text-white shadow-xs flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            {bus.bus_id}
+          </span>
         </div>
       </div>
 
