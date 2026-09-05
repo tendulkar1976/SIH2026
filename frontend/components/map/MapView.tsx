@@ -30,39 +30,16 @@ interface MapViewProps {
   height?: string;
 }
 
-// Key municipal bus transit corridor trajectories in Bangalore
+// Key municipal bus transit corridor trajectory for single active bus node BUS-102
 const routePolylines: Record<string, [number, number][]> = {
-  'R-05': [
-    [12.8452, 77.6602],
-    [12.8900, 77.6400],
-    [12.9200, 77.6200],
-    [12.9716, 77.5946],
-    [12.9750, 77.6090],
-  ],
   'R-12': [
-    [12.9352, 77.6245],
+    [12.9250, 77.6320],
     [12.9279, 77.6271],
     [12.9341, 77.6189],
+    [12.9352, 77.6245],
+    [12.9390, 77.6200],
+    [12.9430, 77.6150],
     [12.9500, 77.6000],
-    [12.9716, 77.5946],
-  ],
-  'R-18': [
-    [12.9279, 77.6833],
-    [12.9550, 77.7000],
-    [12.9856, 77.7312],
-    [13.0000, 77.7100],
-  ],
-  'R-24': [
-    [12.9141, 77.6101],
-    [12.9400, 77.5900],
-    [12.9784, 77.5721],
-    [13.0000, 77.5600],
-  ],
-  'R-09': [
-    [12.9716, 77.5946],
-    [13.0000, 77.5900],
-    [13.0358, 77.5970],
-    [13.0600, 77.6000],
   ],
 };
 
@@ -151,10 +128,10 @@ export const MapView: React.FC<MapViewProps> = ({
       });
 
       if (!mapInstanceRef.current) {
-        // Centered around central Bangalore command zone
+        // Centered directly on active edge sensing bus node (BUS-102 Koramangala corridor)
         const map = L.map(mapContainerRef.current, {
-          center: [12.9516, 77.6346],
-          zoom: 12,
+          center: [12.9352, 77.6245],
+          zoom: 14,
           zoomControl: false,
         });
 
