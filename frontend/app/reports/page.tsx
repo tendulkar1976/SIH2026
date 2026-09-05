@@ -104,28 +104,28 @@ export default function ReportsPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
             <span className="text-[10px] text-slate-400 block uppercase">Total Detections</span>
-            <strong className="text-xl text-slate-900">{stats.total_incidents} Events</strong>
+            <strong className="text-xl text-slate-900">{incidents.length} Events</strong>
           </div>
 
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
             <span className="text-[10px] text-slate-400 block uppercase">PWD Road Defects</span>
-            <strong className="text-xl text-amber-600">{stats.potholes} Potholes</strong>
+            <strong className="text-xl text-amber-600">{incidents.filter((i) => i.assigned_department === 'pwd_roads').length} Defects</strong>
           </div>
 
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
             <span className="text-[10px] text-slate-400 block uppercase">Traffic Violations</span>
-            <strong className="text-xl text-rose-600">{stats.rash_driving} Violations</strong>
+            <strong className="text-xl text-rose-600">{incidents.filter((i) => i.assigned_department === 'traffic_police').length} Violations</strong>
           </div>
 
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
             <span className="text-[10px] text-slate-400 block uppercase">Active Emergency Alerts</span>
-            <strong className="text-xl text-rose-700">{stats.active_alerts} Priority</strong>
+            <strong className="text-xl text-rose-700">{incidents.filter((i) => i.severity === 'critical').length} Priority</strong>
           </div>
         </div>
 
         <p className="text-xs text-slate-600 leading-relaxed pt-2">
-          Automated edge AI analytics across Bangalore municipal bus routes R-05, R-12, R-18, R-24, R-09, and R-33 have detected 
-          <strong> {stats.total_incidents} discrete civic anomalies</strong> over the current 24-hour cycle. 
+          Automated optical edge AI analytics from active transit node <strong>BUS-102</strong> along <strong>Route R-12 (Majestic KBS ⇄ Silk Board Junction)</strong> have detected 
+          <strong> {incidents.length} discrete civic anomalies</strong> over the current operational cycle. 
           High-priority road surface defects have been routed to the PWD rapid repair cell, and critical safety violations have been logged into the Traffic Management Center queue.
         </p>
       </div>
