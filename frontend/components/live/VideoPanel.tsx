@@ -223,8 +223,8 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
           </>
         )}
 
-        {/* Real-time AI Overlays (Bounding Boxes + Confidence + Labels) */}
-        {showDetections && isPlaying && (
+        {/* Real-time AI Overlays (Bounding Boxes + Confidence + Labels) - only for demo video, real phone renders on-device boxes */}
+        {showDetections && isPlaying && !isLiveDevice && (
           <DetectionOverlay detections={bus.detections_in_frame} />
         )}
 

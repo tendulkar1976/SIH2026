@@ -277,6 +277,8 @@ class RealtimeService {
 
       currentBuses.forEach((bus) => {
         if (!bus.is_online) return;
+        // Do not inject fake demo bounding boxes or fake telemetry if real phone is streaming
+        if (state.isRealPhoneConnected && bus.bus_id === 'BUS-102') return;
 
         // Subtle realistic GPS drift along route
         const latDrift = (Math.random() - 0.5) * 0.0004;

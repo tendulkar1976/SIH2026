@@ -319,6 +319,7 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
               is_online: connected ? true : bus.is_online,
               status: (connected ? 'ONLINE' : bus.status) as BusStatus,
               camera_status: (connected ? 'LIVE' : bus.camera_status) as CameraStatus,
+              detections_in_frame: connected ? [] : bus.detections_in_frame,
             }
           : bus
       );
