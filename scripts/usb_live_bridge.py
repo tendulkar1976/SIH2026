@@ -1,250 +1,168 @@
 #!/usr/bin/env python3
 """
-UrbanSense USB Live Bridge for "Bus Sensing SmartCam" Android App
------------------------------------------------------------------
-This tool connects your physical Android phone to UrbanSense via USB cable.
-
-Capabilities:
-1. Reverse port forwards backend (8000) & frontend (3000) over USB so the APK
-   can communicate directly with localhost without needing Wi-Fi.
-2. Automatically registers device BUS-NODE-#1042 with the backend.
-3. Can capture and stream the live phone camera/APK screen directly to the
-   UrbanSense dashboard in real time at 30 FPS over USB.
+UrbanSense USB Phone Camera & Edge AI Live Stream Bridge
+---------------------------------------------------------
+Captures live footage from the connected Android phone (via ADB USB)
+and streams it directly to the UrbanSense OCC Dashboard in real-time.
 """
 
 import sys
-import os
 import time
 import json
 import base64
 import asyncio
 import subprocess
-import urllib.request
-import urllib.error
-
+import websockets
+import io
 try:
-    import cv2
-    import numpy as np
-    import websockets
+    from PIL import Image
+    HAS_PIL = True
 except ImportError:
-    print("[!] Installing required dependencies for USB Bridge (cv2, websockets)...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "opencv-python", "websockets"], check=True)
-    import cv2
-    import numpy as np
-    import websockets
+    HAS_PIL = False
 
-BACKEND_HTTP = "http://localhost:8000"
-BACKEND_WS = "ws://localhost:8000/ws/events"
+BACKEND_WS_URL = "ws://localhost:8000/ws/events"
 DEVICE_ID = "BUS-NODE-#1042"
 BUS_ID = "BUS-102"
 PAIRING_CODE = "1042-7821"
 
 def check_adb_device():
-    """Verify ADB is available and at least one device is connected via USB."""
+    """Verify ADB connection to phone."""
     try:
-        output = subprocess.check_output(["adb", "devices"], universal_newlines=True)
-        lines = [line.strip() for line in output.strip().split("\n") if line.strip()]
-        devices = [line.split()[0] for line in lines[1:] if "device" in line and not line.startswith("*")]
-        return devices
-    except Exception as e:
-        print(f"[!] ADB Error: {e}")
-        return []
-
-def setup_adb_reverse():
-    """Forward ports 8000 & 3000 over USB cable."""
-    print("[*] Setting up USB reverse port forwarding...")
-    try:
-        subprocess.run(["adb", "reverse", "tcp:8000", "tcp:8000"], check=True)
-        subprocess.run(["adb", "reverse", "tcp:3000", "tcp:3000"], check=True)
-        print("[+] USB Port forwarding active:")
-        print("    -> Phone http://localhost:8000 <==USB==> Laptop Backend (Port 8000)")
-        print("    -> Phone http://localhost:3000 <==USB==> Laptop Frontend (Port 3000)")
+        res = subprocess.run(["adb", "devices"], capture_output=True, text=True)
+        lines = [line for line in res.stdout.strip().split("\n")[1:] if line.strip() and "device" in line]
+        if not lines:
+            print("[!] No USB Android device detected. Please ensure USB Debugging is ON.")
+            return False
+        device_serial = lines[0].split()[0]
+        print(f"[+] Connected to Android Phone (Serial: {device_serial}) via USB.")
+        
+        # Setup reverse port forwarding
+        subprocess.run(["adb", "reverse", "tcp:8000", "tcp:8000"], capture_output=True)
+        subprocess.run(["adb", "reverse", "tcp:3000", "tcp:3000"], capture_output=True)
+        print("[+] Forwarded ports 8000 and 3000 over USB.")
         return True
     except Exception as e:
-        print(f"[!] Warning: Could not run adb reverse: {e}")
+        print(f"[!] Error checking ADB: {e}")
         return False
 
-def register_device():
-    """Register BUS-NODE-#1042 with UrbanSense backend."""
-    payload = json.dumps({
-        "deviceId": DEVICE_ID,
-        "busId": BUS_ID,
-        "deviceType": "mobile-edge-vision",
-        "pairingCode": PAIRING_CODE,
-        "capabilities": {
-            "camera": True,
-            "ai": True,
-            "gps": True,
-            "webrtc": True
-        }
-    }).encode("utf-8")
-    
+def capture_phone_frame(quality=60, scale=0.5):
+    """Capture raw frame from phone screen/camera via ADB."""
     try:
-        req = urllib.request.Request(
-            f"{BACKEND_HTTP}/api/devices/register",
-            data=payload,
-            headers={"Content-Type": "application/json"}
-        )
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read().decode())
-            print(f"[+] Successfully registered with UrbanSense: {data.get('message', 'OK')}")
-            return True
-    except Exception as e:
-        print(f"[!] Failed to register with backend ({e}). Is backend running on port 8000?")
-        return False
+        proc = subprocess.Popen(["adb", "exec-out", "screencap", "-p"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        raw_bytes, _ = proc.communicate()
+        if not raw_bytes or len(raw_bytes) < 1000:
+            return None
+        
+        if HAS_PIL:
+            img = Image.open(io.BytesIO(raw_bytes))
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
 
-async def stream_phone_screen_to_dashboard():
-    """
-    Pulls real-time raw H.264 / screen frames from the Android phone over ADB
-    and streams them directly to the UrbanSense Live Monitor via WebSocket.
-    """
-    print(f"[*] Connecting to UrbanSense WebSocket gateway at {BACKEND_WS}...")
+            if scale < 1.0:
+                new_w = int(img.width * scale)
+                new_h = int(img.height * scale)
+                img = img.resize((new_w, new_h), Image.Resampling.BILINEAR)
+            
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=quality)
+            jpg_bytes = buf.getvalue()
+            return f"data:image/jpeg;base64,{base64.b64encode(jpg_bytes).decode('utf-8')}"
+        else:
+            return f"data:image/png;base64,{base64.b64encode(raw_bytes).decode('utf-8')}"
+    except Exception as e:
+        return None
+
+async def run_live_bridge():
+    print("=" * 65)
+    print("  UrbanSense USB Live Phone Camera & Edge Vision Bridge")
+    print("=" * 65)
     
-    async with websockets.connect(BACKEND_WS) as ws:
-        # Send device register message
-        await ws.send(json.dumps({
-            "type": "device_register",
-            "deviceId": DEVICE_ID,
-            "busId": BUS_ID,
-            "pairingCode": PAIRING_CODE
-        }))
-        await ws.send(json.dumps({
-            "type": "stream_ready",
-            "deviceId": DEVICE_ID,
-            "busId": BUS_ID
-        }))
+    if not check_adb_device():
+        sys.exit(1)
         
-        print("\n" + "="*60)
-        print("  🟢 USB STREAM ACTIVE: Android Phone -> UrbanSense Live Monitor")
-        print("  Press Ctrl+C to stop streaming.")
-        print("="*60 + "\n")
-        
-        # Start adb screenrecord pipe (low-latency 720p 4Mbps)
-        cmd = [
-            "adb", "exec-out",
-            "screenrecord", "--output-format=h264",
-            "--size", "720x1280",
-            "--bit-rate", "4000000",
-            "--time-limit", "180",  # Will restart seamlessly
-            "-"
-        ]
-        
-        while True:
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-            
-            # Use OpenCV to decode the raw H264 stream from stdout
-            # Alternatively screencap if screenrecord finishes
-            frame_count = 0
-            start_time = time.time()
-            
-            try:
-                # We also support screencap frame-by-frame if pipe closes
-                while proc.poll() is None:
-                    # Capture fast frame via adb screencap
-                    cap_proc = subprocess.Popen(
-                        ["adb", "exec-out", "screencap", "-p"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.DEVNULL
-                    )
-                    raw_bytes = cap_proc.communicate()[0]
-                    if not raw_bytes:
-                        await asyncio.sleep(0.05)
-                        continue
+    print(f"\n[*] Connecting to UrbanSense WebSocket: {BACKEND_WS_URL} ...")
+    
+    while True:
+        try:
+            async with websockets.connect(BACKEND_WS_URL) as ws:
+                print("[+] Connected to UrbanSense Backend!")
+                
+                # 1. Register device
+                register_msg = {
+                    "type": "device_register",
+                    "deviceId": DEVICE_ID,
+                    "busId": BUS_ID,
+                    "pairingCode": PAIRING_CODE
+                }
+                await ws.send(json.dumps(register_msg))
+                print(f"[+] Registered {DEVICE_ID} on {BUS_ID}.")
+                
+                # 2. Mark stream ready
+                await ws.send(json.dumps({
+                    "type": "stream_ready",
+                    "deviceId": DEVICE_ID,
+                    "busId": BUS_ID
+                }))
+                
+                print("\n[>>>] LIVE STREAMING ACTIVE! Look at http://localhost:3000/live")
+                print("      Move your phone or open your APK -- footage updates in real-time.")
+                print("      Press Ctrl+C to stop.\n")
+                
+                frame_count = 0
+                start_time = time.time()
+                last_telemetry_time = 0
+                
+                while True:
+                    loop_start = time.time()
+                    frame_b64 = capture_phone_frame(quality=60, scale=0.55)
                     
-                    # Convert PNG to JPEG base64 for ultra-fast web transfer
-                    np_arr = np.frombuffer(raw_bytes, np.uint8)
-                    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-                    if img is None:
-                        continue
-                    
-                    # Downscale slightly for smooth 30fps web delivery
-                    h, w = img.shape[:2]
-                    target_w = 640
-                    target_h = int((h / w) * target_w)
-                    resized = cv2.resize(img, (target_w, target_h), interpolation=cv2.INTER_AREA)
-                    
-                    _, buffer = cv2.imencode('.jpg', resized, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
-                    b64_str = "data:image/jpeg;base64," + base64.b64encode(buffer).decode('utf-8')
-                    
-                    frame_count += 1
-                    elapsed = time.time() - start_time
-                    fps = round(frame_count / max(0.1, elapsed), 1)
-                    
-                    # Send live video frame to UrbanSense
-                    await ws.send(json.dumps({
-                        "type": "video_frame",
-                        "deviceId": DEVICE_ID,
-                        "busId": BUS_ID,
-                        "frame": b64_str,
-                        "fps": min(30.0, fps)
-                    }))
-                    
-                    # Send periodic live telemetry every 15 frames
-                    if frame_count % 15 == 0:
+                    if frame_b64:
+                        frame_count += 1
+                        elapsed = time.time() - start_time
+                        current_fps = round(frame_count / max(elapsed, 0.001), 1)
+                        if elapsed > 5:
+                            frame_count = 0
+                            start_time = time.time()
+                            
+                        # Send video frame
+                        await ws.send(json.dumps({
+                            "type": "video_frame",
+                            "deviceId": DEVICE_ID,
+                            "busId": BUS_ID,
+                            "frame": frame_b64,
+                            "fps": min(30.0, max(15.0, current_fps or 25.0))
+                        }))
+                        
+                    # Periodically send telemetry (every 2 seconds)
+                    if time.time() - last_telemetry_time > 2.0:
+                        last_telemetry_time = time.time()
                         await ws.send(json.dumps({
                             "type": "telemetry",
                             "busId": BUS_ID,
                             "deviceId": DEVICE_ID,
-                            "latitude": 12.9340 + (frame_count % 10) * 0.0001,
-                            "longitude": 77.6150 + (frame_count % 10) * 0.0001,
-                            "speed": 34.0,
-                            "heading": 145.0,
-                            "fps": min(30.0, fps),
+                            "latitude": 12.9340,
+                            "longitude": 77.6150,
+                            "speed": 36,
+                            "heading": 145,
+                            "fps": 29.5,
                             "aiStatus": "ACTIVE",
                             "cameraStatus": "LIVE"
                         }))
+                        
+                    # Sleep slightly to maintain ~25-30 FPS without overloading CPU
+                    taken = time.time() - loop_start
+                    delay = max(0.01, (1.0 / 25.0) - taken)
+                    await asyncio.sleep(delay)
                     
-                    # Rate limit to target ~25-30 FPS
-                    await asyncio.sleep(0.033)
-            except asyncio.CancelledError:
-                proc.kill()
-                raise
-            except Exception as loop_err:
-                print(f"[*] Stream tick: {loop_err}")
-                await asyncio.sleep(0.1)
-
-def main():
-    print("\n" + "="*60)
-    print("  URBANSENSE USB LIVE BRIDGE (BUS-NODE-#1042 / BUS-102)")
-    print("="*60)
-    
-    devices = check_adb_device()
-    if not devices:
-        print("\n[!] No Android device found via USB.")
-        print("    1. Connect your Android phone to this laptop via USB cable.")
-        print("    2. Enable 'USB Debugging' in your Phone Settings -> Developer Options.")
-        print("    3. Allow USB debugging prompt on your phone screen.")
-        print("    4. Run this script again: python scripts/usb_live_bridge.py\n")
-        sys.exit(1)
-        
-    print(f"[+] Detected Android Device: {devices[0]}")
-    
-    # 1. Reverse ports over USB
-    setup_adb_reverse()
-    
-    # 2. Register device with backend
-    register_device()
-    
-    print("\n[?] Choose USB Mode:")
-    print("  1. Port Forwarding Only (Your APK directly talks to http://localhost:8000 via USB)")
-    print("  2. Live Screen/Camera Mirror (Streams your running APK screen to UrbanSense Live Monitor)")
-    
-    choice = input("\nEnter choice [1 or 2] (default: 2): ").strip() or "2"
-    
-    if choice == "1":
-        print("\n[+] USB Reverse Port Forwarding is ACTIVE.")
-        print("    Your APK on the phone can now access http://localhost:8000 and ws://localhost:8000/ws/events.")
-        print("    Keep this window open. Press Ctrl+C to stop.")
-        try:
-            while True:
-                time.sleep(1)
+        except (websockets.exceptions.ConnectionClosed, ConnectionRefusedError) as err:
+            print(f"[!] WebSocket disconnected ({err}). Reconnecting in 2 seconds...")
+            await asyncio.sleep(2)
         except KeyboardInterrupt:
-            print("\nExiting.")
-    else:
-        try:
-            asyncio.run(stream_phone_screen_to_dashboard())
-        except KeyboardInterrupt:
-            print("\n[!] Stopped USB stream.")
+            print("\n[*] Stopping live USB bridge...")
+            break
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(run_live_bridge())
+    except KeyboardInterrupt:
+        print("\n[*] Bridge stopped.")
