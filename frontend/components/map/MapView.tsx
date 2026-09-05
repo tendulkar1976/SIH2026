@@ -33,13 +33,25 @@ interface MapViewProps {
 // Key municipal bus transit corridor trajectory for single active bus node BUS-102
 const routePolylines: Record<string, [number, number][]> = {
   'R-12': [
-    [12.9250, 77.6320],
-    [12.9279, 77.6271],
-    [12.9341, 77.6189],
-    [12.9352, 77.6245],
-    [12.9390, 77.6200],
-    [12.9430, 77.6150],
-    [12.9500, 77.6000],
+    [12.9772, 77.5713], // Majestic KBS Platform 14
+    [12.9698, 77.5878], // Hudson Circle / Corporation
+    [12.9665, 77.5990], // Richmond Circle
+    [12.9554, 77.5932], // Shanthinagar Bus Station
+    [12.9507, 77.5848], // Lalbagh Main Gate
+    [12.9431, 77.5950], // Wilson Garden 10th Cross
+    [12.9372, 77.6001], // Dairy Circle Underpass
+    [12.9344, 77.6059], // Christ University / Hosur Rd
+    [12.9388, 77.6134], // Adugodi Bosch Gate
+    [12.9341, 77.6189], // Sony World Signal (100ft Rd)
+    [12.9352, 77.6245], // Koramangala 80ft Rd 4th Block (BUS-102 Position)
+    [12.9304, 77.6152], // Forum Mall Junction
+    [12.9298, 77.6212], // St. John's Signal
+    [12.9224, 77.6198], // Madiwala Market
+    [12.9180, 77.6225], // Madiwala Lake Road
+    [12.9174, 77.6238], // Silk Board Junction Underpass
+    [12.9141, 77.6101], // Silk Board Flyover Ramp
+    [12.9150, 77.6050], // BTM 2nd Stage Ring Road
+    [12.9115, 77.6388], // HSR Layout 14th Main
   ],
 };
 
@@ -128,10 +140,10 @@ export const MapView: React.FC<MapViewProps> = ({
       });
 
       if (!mapInstanceRef.current) {
-        // Centered directly on active edge sensing bus node (BUS-102 Koramangala corridor)
+        // Centered across the active Bangalore Route R-12 transit corridor
         const map = L.map(mapContainerRef.current, {
-          center: [12.9352, 77.6245],
-          zoom: 14,
+          center: [12.9420, 77.6100],
+          zoom: 13,
           zoomControl: false,
         });
 
