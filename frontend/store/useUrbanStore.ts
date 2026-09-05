@@ -86,6 +86,7 @@ interface UrbanState {
   livePhoneFps: number;
   livePhoneLatency: number;
   livePhoneStream: MediaStream | null;
+  livePhoneFrame: string | null;
   connectModalOpen: boolean;
   latestEdgeDetection: {
     type: string;
@@ -109,6 +110,7 @@ interface UrbanState {
   setRealPhoneConnected: (connected: boolean) => void;
   setConnectModalOpen: (open: boolean) => void;
   setLivePhoneStream: (stream: MediaStream | null) => void;
+  setLivePhoneFrame: (frame: string | null) => void;
   recordEdgeDetection: (detection: {
     type: string;
     confidence: number;
@@ -241,6 +243,7 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
   livePhoneFps: 30.0,
   livePhoneLatency: 45,
   livePhoneStream: null,
+  livePhoneFrame: null,
   connectModalOpen: false,
   latestEdgeDetection: {
     type: 'Pothole',
@@ -329,6 +332,8 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
   setConnectModalOpen: (open) => set({ connectModalOpen: open }),
 
   setLivePhoneStream: (stream) => set({ livePhoneStream: stream }),
+
+  setLivePhoneFrame: (frame) => set({ livePhoneFrame: frame, isRealPhoneConnected: true }),
 
   recordEdgeDetection: (det) =>
     set((state) => {

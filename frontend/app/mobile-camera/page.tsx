@@ -72,22 +72,24 @@ export default function MobileCameraPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
   const wsBaseUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws/events';
 
-  // 1. Initialize Camera
+  // 1. Initialize Camera and frame streaming
   useEffect(() => {
     let mounted = true;
+    let frameInterval: NodeJS.Timeout | null = null;
 
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
+            width: { ideal: 640 },
+            height: { ideal: 480 },
           },
           audio: false,
         });
@@ -100,6 +102,33 @@ export default function MobileCameraPage() {
         }
         setCameraReady(true);
         console.log('[MobileCamera] Camera started successfully');
+
+        // Start dual-channel frame broadcaster
+        frameInterval = setInterval(() => {
+          if (videoRef.current && canvasRef.current && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+              canvas.width = 480;
+              canvas.height = Math.round((480 * video.videoHeight) / video.videoWidth);
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const frameData = canvas.toDataURL('image/jpeg', 0.6);
+                wsRef.current.send(
+                  JSON.stringify({
+                    type: 'video_frame',
+                    deviceId,
+                    busId,
+                    frame: frameData,
+                    fps: 29.5,
+                  })
+                );
+              }
+            }
+          }
+        }, 75); // ~13 FPS stream
+
       } catch (err) {
         console.warn('[MobileCamera] Could not access physical camera:', err);
         setCameraReady(true); // Allow running in preview mode
@@ -110,11 +139,12 @@ export default function MobileCameraPage() {
 
     return () => {
       mounted = false;
+      if (frameInterval) clearInterval(frameInterval);
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [deviceId, busId]);
 
   // 2. Connect WebSocket & Register Device
   useEffect(() => {
@@ -346,6 +376,7 @@ export default function MobileCameraPage() {
             muted
             className="w-full h-full object-cover"
           />
+          <canvas ref={canvasRef} className="hidden" />
 
           {/* AI Bounding Boxes Overlay on Phone View */}
           {aiOverlayOn && (

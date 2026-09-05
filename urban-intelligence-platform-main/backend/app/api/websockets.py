@@ -30,6 +30,12 @@ async def websocket_endpoint(websocket: WebSocket):
                         fps=float(msg.get("fps", 30.0)),
                         timestamp=msg.get("timestamp")
                     )
+                elif msg_type == "video_frame":
+                    await edge_hub.broadcast_video_frame(
+                        device_id=msg.get("deviceId", "BUS-NODE-#1042"),
+                        frame_base64=msg.get("frame", ""),
+                        fps=float(msg.get("fps", 30.0))
+                    )
                 elif msg_type == "detection":
                     await edge_hub.record_detection(msg)
                 elif msg_type == "webrtc_offer":

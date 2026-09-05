@@ -55,6 +55,7 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
     edgeStatus,
     livePhoneFps,
     livePhoneLatency,
+    livePhoneFrame,
     setRealPhoneConnected,
   } = useUrbanStore();
 
@@ -166,16 +167,25 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
 
       {/* Main Stream Canvas */}
       <div className="relative w-full h-full bg-slate-950 overflow-hidden flex items-center justify-center">
-        {/* Real Phone WebRTC Stream Element */}
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            isLiveDevice ? 'block opacity-95' : 'hidden'
-          }`}
-        />
+        {/* Real Phone Camera Live Stream (WebRTC or Live Dual-Channel Stream) */}
+        {isLiveDevice && livePhoneFrame ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={livePhoneFrame}
+            alt="Live Phone Camera Feed"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              isLiveDevice ? 'block opacity-95' : 'hidden'
+            }`}
+          />
+        )}
 
         {/* Fallback Demo Stream when not in WebRTC mode */}
         {!isLiveDevice && (

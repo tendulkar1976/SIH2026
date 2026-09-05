@@ -129,15 +129,19 @@ class EdgeDeviceHub:
             "timestamp": dev["lastSeen"]
         })
 
-    async def update_telemetry(self, bus_id: str, device_id: str, latitude: float, longitude: float, speed: float, heading: float, fps: float, timestamp: Optional[str] = None):
+    async def broadcast_video_frame(self, device_id: str, frame_base64: str, fps: float = 30.0):
         dev = self.get_device(device_id)
-        now_str = timestamp or datetime.now(timezone.utc).isoformat()
-        dev["latitude"] = latitude
-        dev["longitude"] = longitude
-        dev["speed"] = speed
-        dev["heading"] = heading
-        dev["fps"] = fps or dev.get("fps", 30.0)
-        dev["lastSeen"] = now_str
+        dev["streamStatus"] = "STREAMING"
+        dev["fps"] = fps
+        dev["isRealPhone"] = True
+        await manager.broadcast({
+            "type": "video_frame",
+            "deviceId": device_id,
+            "busId": dev.get("busId", "BUS-102"),
+            "frame": frame_base64,
+            "fps": fps,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
         dev["gpsStatus"] = "ACTIVE"
 
         await manager.broadcast({

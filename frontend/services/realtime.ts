@@ -51,7 +51,16 @@ class RealtimeService {
             store.setEdgeStatus('STREAM_READY');
           }
 
-          // 2. Camera & Sensor Status Broadcast
+          // 2. Live Video Frame Broadcast (Dual-Channel Backup)
+          if (payload.type === 'video_frame' && payload.frame) {
+            store.setLivePhoneFrame(payload.frame);
+            store.setRealPhoneConnected(true);
+            if (payload.fps) {
+              store.updateEdgeTelemetry({ fps: payload.fps });
+            }
+          }
+
+          // 3. Camera & Sensor Status Broadcast
           if (payload.type === 'camera_status') {
             if (payload.cameraStatus === 'LIVE') {
               store.setEdgeStatus('LIVE');
