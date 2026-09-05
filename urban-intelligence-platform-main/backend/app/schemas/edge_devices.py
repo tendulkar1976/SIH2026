@@ -2,12 +2,25 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Any, Dict
 from datetime import datetime
 
+class DeviceRegisterRequest(BaseModel):
+    deviceId: str = Field(default="BUS-NODE-#1042")
+    busId: str = Field(default="BUS-102")
+    deviceType: Optional[str] = "mobile-edge-vision"
+    pairingCode: Optional[str] = "1042-7821"
+    capabilities: Optional[Dict[str, Any]] = Field(default_factory=lambda: {
+        "camera": True,
+        "ai": True,
+        "gps": True,
+        "webrtc": True
+    })
+
 class DevicePairRequest(BaseModel):
     deviceId: str = Field(default="BUS-NODE-#1042")
-    pairingCode: str = Field(default="1042-7821")
-    busId: str = Field(default="BUS-102")
-    deviceType: Optional[str] = "Android Bus Sensing SmartCam"
+    pairingCode: Optional[str] = "1042-7821"
+    busId: Optional[str] = "BUS-102"
+    deviceType: Optional[str] = "mobile-edge-vision"
     appVersion: Optional[str] = "1.0"
+    capabilities: Optional[Dict[str, Any]] = None
 
 class DevicePairResponse(BaseModel):
     success: bool
@@ -48,13 +61,15 @@ class BoundingBoxCoord(BaseModel):
 class EdgeDetectionRequest(BaseModel):
     busId: str = "BUS-102"
     deviceId: str = "BUS-NODE-#1042"
-    detectionType: str  # "Pothole", "Zebra Crossing", "Person", "Vehicle", "Wrong Way", etc.
+    detectionType: Optional[str] = None  # "Pothole", "Zebra Crossing", "Person", "Vehicle", etc.
+    label: Optional[str] = None          # "Person", "Pothole", "Vehicle", etc.
     confidence: float
     latitude: Optional[float] = 12.9352
     longitude: Optional[float] = 77.6245
     timestamp: Optional[str] = None
     severity: Optional[str] = "High"
-    bbox: Optional[List[float]] = None # [x_pct, y_pct, width_pct, height_pct] or [ymin, xmin, ymax, xmax]
+    bbox: Optional[List[float]] = None # [x_pct, y_pct, width_pct, height_pct]
+    boundingBox: Optional[Dict[str, float]] = None # {"x": 0.21, "y": 0.18, "width": 0.30, "height": 0.42}
     licensePlate: Optional[str] = None
     speedEstimate: Optional[float] = None
     description: Optional[str] = None

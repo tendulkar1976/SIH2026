@@ -159,14 +159,36 @@ class EdgeDeviceHub:
     async def record_detection(self, detection_data: Dict[str, Any]):
         device_id = detection_data.get("deviceId", "BUS-NODE-#1042")
         bus_id = detection_data.get("busId", "BUS-102")
+        det_type = detection_data.get("label") or detection_data.get("detectionType") or "Pothole"
+        confidence = float(detection_data.get("confidence", 0.94))
+        
+        # Parse bounding box (supports {"x": 0.21, "y": 0.18, "width": 0.3, "height": 0.42} or [x, y, w, h])
+        raw_box = detection_data.get("boundingBox") or detection_data.get("bbox")
+        bbox_pct = [20.0, 30.0, 40.0, 30.0]
+        if isinstance(raw_box, dict):
+            bx = raw_box.get("x", 0.2)
+            by = raw_box.get("y", 0.3)
+            bw = raw_box.get("width", 0.4)
+            bh = raw_box.get("height", 0.3)
+            # If normalized between 0 and 1, convert to 0-100%
+            if max(bx, by, bw, bh) <= 1.0:
+                bbox_pct = [bx * 100, by * 100, bw * 100, bh * 100]
+            else:
+                bbox_pct = [bx, by, bw, bh]
+        elif isinstance(raw_box, list) and len(raw_box) >= 4:
+            if max(raw_box[:4]) <= 1.0:
+                bbox_pct = [v * 100 for v in raw_box[:4]]
+            else:
+                bbox_pct = list(raw_box[:4])
+
         dev = self.get_device(device_id)
         dev["detectionsCount"] = dev.get("detectionsCount", 0) + 1
         dev["latestDetection"] = {
-            "type": detection_data.get("detectionType", "Pothole"),
-            "confidence": detection_data.get("confidence", 0.94),
+            "type": det_type,
+            "confidence": confidence,
             "severity": detection_data.get("severity", "High"),
             "timestamp": detection_data.get("timestamp") or datetime.now(timezone.utc).isoformat(),
-            "bbox": detection_data.get("bbox", [20, 30, 40, 30])
+            "bbox": bbox_pct
         }
 
         # Broadcast detection event
@@ -174,13 +196,20 @@ class EdgeDeviceHub:
             "type": "detection",
             "busId": bus_id,
             "deviceId": device_id,
-            "detectionType": detection_data.get("detectionType", "Pothole"),
-            "confidence": detection_data.get("confidence", 0.94),
+            "label": det_type,
+            "detectionType": det_type,
+            "confidence": confidence,
             "severity": detection_data.get("severity", "High"),
             "latitude": detection_data.get("latitude", dev.get("latitude", 12.9352)),
             "longitude": detection_data.get("longitude", dev.get("longitude", 77.6245)),
             "timestamp": detection_data.get("timestamp") or datetime.now(timezone.utc).isoformat(),
-            "bbox": detection_data.get("bbox"),
+            "bbox": bbox_pct,
+            "boundingBox": {
+                "x": bbox_pct[0] / 100.0,
+                "y": bbox_pct[1] / 100.0,
+                "width": bbox_pct[2] / 100.0,
+                "height": bbox_pct[3] / 100.0
+            },
             "licensePlate": detection_data.get("licensePlate"),
             "speedEstimate": detection_data.get("speedEstimate"),
             "description": detection_data.get("description")

@@ -259,7 +259,7 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({ bus }) => {
 
           <div className="px-2.5 py-1 rounded-md bg-slate-900/90 backdrop-blur-md border border-slate-700/60 text-[10px] font-mono text-slate-300 shadow-sm flex items-center gap-1.5">
             <Sparkles className="w-3 h-3 text-cyan-400" />
-            <span>
+            <span suppressHydrationWarning>
               {new Date().toLocaleTimeString()} IST | {isLiveDevice ? livePhoneLatency : bus.latency_ms}ms
             </span>
           </div>
