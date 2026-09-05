@@ -221,55 +221,6 @@ export default function LoginPage() {
             Transforming public transport into mobile urban sensing units for safer roads, efficient infrastructure and a better tomorrow.
           </p>
 
-          {/* 4 Feature Highlights Side-by-Side */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl pt-2">
-            
-            {/* Feature 1 */}
-            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
-                <Construction className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 leading-tight">Detect</div>
-                <div className="text-[11px] font-medium text-slate-500 leading-tight">Road Issues</div>
-              </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                <Car className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 leading-tight">Monitor</div>
-                <div className="text-[11px] font-medium text-slate-500 leading-tight">Traffic</div>
-              </div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
-                <ShieldAlert className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 leading-tight">Enhance</div>
-                <div className="text-[11px] font-medium text-slate-500 leading-tight">Public Safety</div>
-              </div>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
-                <BarChart3 className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 leading-tight">Enable</div>
-                <div className="text-[11px] font-medium text-slate-500 leading-tight">Data-Driven Decisions</div>
-              </div>
-            </div>
-
-          </div>
-
         </div>
 
         {/* RIGHT LOGIN CARD (48%) */}
