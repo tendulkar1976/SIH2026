@@ -214,10 +214,10 @@ export const IncidentTable: React.FC = () => {
                   </td>
 
                   {/* Location */}
-                  <td className="py-3.5 px-3 font-mono text-[11px] text-slate-600 max-w-[140px] truncate">
-                    <div className="flex items-center gap-1 truncate" title={`GPS: ${inc.latitude.toFixed(4)}, ${inc.longitude.toFixed(4)}`}>
-                      <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
-                      <span className="truncate">Route {inc.route_id} Corridor</span>
+                  <td className="py-3.5 px-3 font-mono text-[11px] text-slate-600 max-w-[180px] truncate">
+                    <div className="flex items-center gap-1.5 truncate" title={`${inc.location_name || `Route ${inc.route_id}`} • GPS: ${inc.latitude.toFixed(4)}, ${inc.longitude.toFixed(4)}`}>
+                      <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                      <span className="truncate font-medium text-slate-700">{inc.location_name || `Route ${inc.route_id} Corridor`}</span>
                     </div>
                   </td>
 

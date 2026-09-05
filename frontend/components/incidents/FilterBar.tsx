@@ -87,7 +87,7 @@ export const FilterBar: React.FC = () => {
               : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          All ({stats.total_incidents})
+          All ({incidents.length})
         </button>
 
         <button
@@ -99,7 +99,7 @@ export const FilterBar: React.FC = () => {
           }`}
         >
           <AlertTriangle className="w-3.5 h-3.5" />
-          <span>Critical Queue ({stats.active_alerts})</span>
+          <span>Critical Queue ({incidents.filter((i) => i.severity === 'critical').length})</span>
         </button>
 
         <button
@@ -111,7 +111,7 @@ export const FilterBar: React.FC = () => {
           }`}
         >
           <Construction className="w-3.5 h-3.5" />
-          <span>Road Potholes ({stats.potholes})</span>
+          <span>Road Potholes ({incidents.filter((i) => i.type === 'pothole').length})</span>
         </button>
 
         <button
@@ -123,43 +123,43 @@ export const FilterBar: React.FC = () => {
           }`}
         >
           <Droplets className="w-3.5 h-3.5" />
-          <span>Waterlogging</span>
+          <span>Waterlogging ({incidents.filter((i) => i.type === 'waterlogging').length})</span>
         </button>
 
         <button
-          onClick={() => setFilter({ type: 'bus_footboard', severity: 'all' })}
+          onClick={() => setFilter({ type: 'missing_crossing', severity: 'all' })}
           className={`px-3 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
-            filter.type === 'bus_footboard'
-              ? 'bg-violet-600 text-white shadow-xs font-semibold'
-              : 'bg-violet-50 text-violet-800 hover:bg-violet-100 border border-violet-200'
+            filter.type === 'missing_crossing'
+              ? 'bg-indigo-600 text-white shadow-xs font-semibold'
+              : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          <Bus className="w-3.5 h-3.5" />
-          <span>Bus Footboard</span>
+          <Footprints className="w-3.5 h-3.5 text-indigo-600" />
+          <span>Missing Crossings ({incidents.filter((i) => i.type === 'missing_crossing').length})</span>
         </button>
 
         <button
-          onClick={() => setFilter({ type: 'rash_driving', severity: 'all' })}
+          onClick={() => setFilter({ type: 'red_light_violation', severity: 'all' })}
           className={`px-3 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
-            filter.type === 'rash_driving'
+            filter.type === 'red_light_violation'
               ? 'bg-rose-600 text-white shadow-xs font-semibold'
               : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
           }`}
         >
           <Car className="w-3.5 h-3.5 text-rose-600" />
-          <span>Rash Driving</span>
+          <span>Red Light ({incidents.filter((i) => i.type === 'red_light_violation').length})</span>
         </button>
 
         <button
-          onClick={() => setFilter({ type: 'anpr', severity: 'all' })}
+          onClick={() => setFilter({ type: 'hit_and_run', severity: 'all' })}
           className={`px-3 py-1 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
-            filter.type === 'anpr'
-              ? 'bg-purple-600 text-white shadow-xs font-semibold'
-              : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
+            filter.type === 'hit_and_run'
+              ? 'bg-red-600 text-white shadow-xs font-semibold'
+              : 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200'
           }`}
         >
           <ShieldAlert className="w-3.5 h-3.5" />
-          <span>ANPR Flags ({stats.anpr_events})</span>
+          <span>Hit-and-Run ({incidents.filter((i) => i.type === 'hit_and_run').length})</span>
         </button>
       </div>
 

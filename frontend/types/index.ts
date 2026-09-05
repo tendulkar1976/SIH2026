@@ -43,6 +43,7 @@ export interface IncidentEvent {
   timestamp: string;
   latitude: number;
   longitude: number;
+  location_name?: string;
   bus_id: string;
   route_id: string;
   vehicle_id: string | null;
