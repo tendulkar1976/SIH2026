@@ -14,12 +14,12 @@ import {
   EyeOff,
   Crown,
   ShieldAlert,
+  Building2,
   Construction,
   Car,
   BarChart3,
   CheckCircle2,
   Sparkles,
-  Radio,
   BadgeAlert,
   LogIn,
   UserPlus,
@@ -167,142 +167,113 @@ export default function LoginPage() {
 
   const getRoleDisplayName = () => {
     if (selectedRole === 'admin') return 'ADMIN';
-    if (selectedRole === 'traffic_authority') return 'TRAFFIC AUTHORITY';
-    return 'MUNICIPAL AUTHORITY';
+    if (selectedRole === 'traffic_authority') return 'TRAFFIC';
+    return 'MUNICIPAL';
   };
 
   return (
-    <div className="min-h-screen -m-6 md:-m-8 bg-gradient-to-br from-slate-50 via-blue-50/20 to-sky-50/30 text-slate-800 relative overflow-hidden flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 font-sans">
+    <div className="min-h-screen -m-6 md:-m-8 bg-[#f5f8fc] text-slate-800 relative overflow-hidden flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 font-sans">
       
-      {/* 1. Subtle Background Elements */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-blue-300/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-[600px] h-[400px] bg-sky-200/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.025] pointer-events-none bg-[radial-gradient(#2563eb_1px,transparent_1px)] [background-size:24px_24px]" />
+      {/* 1. Background City Bus Graphic (BMTC Electric Bus) across lower left */}
+      <div className="absolute bottom-0 left-0 w-full lg:w-[62%] h-[55%] lg:h-[68%] pointer-events-none -z-0">
+        <Image
+          src="/images/bmtc_bus.jpg"
+          alt="BMTC Electric Bus in Bangalore"
+          fill
+          priority
+          className="object-cover object-left-bottom opacity-90"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#f5f8fc]/40 via-transparent to-[#f5f8fc]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#f5f8fc]/30 to-[#f5f8fc]" />
+      </div>
 
-      {/* 2. Top Bar */}
-      <header className="relative z-10 w-full px-6 sm:px-12 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-500 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
-            <Shield className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 leading-none">
-              URBANSENSE OCC
-            </div>
-            <div className="text-[11px] font-sans text-slate-500 font-medium tracking-wide mt-0.5">
-              Safer Roads. Smarter Cities.
-            </div>
-          </div>
-        </div>
+      {/* Atmospheric glow shapes */}
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-blue-300/10 rounded-full blur-[120px] pointer-events-none -z-0" />
+      <div className="absolute bottom-0 left-1/4 w-[600px] h-[400px] bg-sky-200/15 rounded-full blur-[140px] pointer-events-none -z-0" />
 
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-400 font-semibold">
-            POWERED BY AI • FOR SMARTER CITIES
-          </span>
-        </div>
+      {/* 2. Top Header Bar: Powered By AI on Right */}
+      <header className="relative z-10 w-full px-6 sm:px-12 py-5 flex items-center justify-end">
+        <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-500 font-semibold">
+          POWERED BY AI • FOR SMARTER CITIES
+        </span>
       </header>
 
-      {/* 3. Main Split Screen */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-3 lg:py-5 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12">
+      {/* 3. Main Split Screen Body */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-2 lg:py-4 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
         
         {/* LEFT HERO SECTION (52%) */}
-        <div className="w-full lg:w-[52%] flex flex-col justify-center space-y-5">
+        <div className="w-full lg:w-[52%] flex flex-col justify-center space-y-6">
           
           {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-mono font-bold uppercase tracking-wider w-fit">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50/90 backdrop-blur-xs border border-blue-200/90 text-blue-700 text-xs font-mono font-bold uppercase tracking-wider w-fit shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             <span>MUNICIPAL URBAN INTELLIGENCE PLATFORM</span>
           </div>
 
           {/* Large Headline */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 font-sans tracking-tight leading-[1.12]">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 font-sans tracking-tight leading-[1.08]">
             Intelligent Buses <br />
             <span className="text-blue-600">for Smarter Cities</span>
           </h1>
 
           {/* Description */}
-          <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-xl">
+          <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-lg">
             Transforming public transport into mobile urban sensing units for safer roads, efficient infrastructure and a better tomorrow.
           </p>
 
-          {/* Feature Highlights: 4 horizontal blocks */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+          {/* 4 Feature Highlights Side-by-Side */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl pt-2">
             
             {/* Feature 1 */}
-            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
                 <Construction className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-[11px] font-bold text-slate-800 leading-tight">Detect</div>
-                <div className="text-[11px] font-bold text-slate-500 leading-tight">Road Issues</div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Detect</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Road Issues</div>
               </div>
             </div>
 
             {/* Feature 2 */}
-            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
                 <Car className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-[11px] font-bold text-slate-800 leading-tight">Monitor</div>
-                <div className="text-[11px] font-bold text-slate-500 leading-tight">Traffic</div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Monitor</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Traffic</div>
               </div>
             </div>
 
             {/* Feature 3 */}
-            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
                 <ShieldAlert className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-[11px] font-bold text-slate-800 leading-tight">Enhance</div>
-                <div className="text-[11px] font-bold text-slate-500 leading-tight">Public Safety</div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Enhance</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Public Safety</div>
               </div>
             </div>
 
             {/* Feature 4 */}
-            <div className="p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex flex-col gap-2">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <div className="p-3.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs flex flex-col gap-2">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
                 <BarChart3 className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-[11px] font-bold text-slate-800 leading-tight">Enable</div>
-                <div className="text-[11px] font-bold text-slate-500 leading-tight">Data Decisions</div>
+                <div className="text-xs font-bold text-slate-900 leading-tight">Enable</div>
+                <div className="text-[11px] font-medium text-slate-500 leading-tight">Data-Driven Decisions</div>
               </div>
             </div>
 
-          </div>
-
-          {/* Simple Clean Bus Image */}
-          <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 shadow-md shadow-slate-200/50 group bg-slate-100">
-            <div className="aspect-[16/8.5] relative w-full overflow-hidden">
-              <Image
-                src="/images/smart_city_bus.jpg"
-                alt="City Transit Public Bus"
-                fill
-                priority
-                className="object-cover object-center group-hover:scale-[1.02] transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
-              
-              {/* Telemetry Badge Overlay */}
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-[10px] font-mono">
-                <span className="flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-white/20 font-semibold">
-                  <Radio className="w-3 h-3 text-blue-400 animate-pulse" />
-                  Edge AI Vision Sensing Fleet • 6 Nodes Online
-                </span>
-                <span className="hidden sm:inline-block bg-blue-600/90 backdrop-blur-xs px-2.5 py-1 rounded-lg font-bold">
-                  29.8 FPS Stream
-                </span>
-              </div>
-            </div>
           </div>
 
         </div>
 
         {/* RIGHT LOGIN CARD (48%) */}
-        <div className="w-full lg:w-[48%] max-w-[520px]">
+        <div className="w-full lg:w-[48%] max-w-[480px]">
           
           {notice && (
             <div className="mb-3 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono font-semibold flex items-center gap-2 shadow-xs">
@@ -318,17 +289,14 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Authentication Card matching screenshot */}
-          <div className="bg-white p-7 sm:p-9 rounded-[2rem] border border-slate-200/80 shadow-xl shadow-blue-100/60 space-y-4">
+          {/* Authentication Card matching screenshot exactly */}
+          <div className="bg-white/95 backdrop-blur-md p-7 sm:p-9 rounded-[2rem] border border-slate-200/90 shadow-2xl shadow-blue-100/60 space-y-4">
             
-            {/* Card Header with Glowing Blue Shield */}
+            {/* Top Shield Emblem */}
             <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-200/60 flex items-center justify-center mb-2 shadow-inner">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-sky-500 text-white flex items-center justify-center shadow-md shadow-blue-500/30">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
+              <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center mb-2 shadow-2xs">
+                <Shield className="w-5 h-5" />
               </div>
-
               <h2 className="text-xl font-black text-slate-900 tracking-tight font-sans">
                 URBANSENSE OCC
               </h2>
@@ -338,14 +306,14 @@ export default function LoginPage() {
             </div>
 
             {/* Auth Tabs Segmented Control */}
-            <div className="grid grid-cols-2 p-1 bg-slate-100/80 rounded-2xl border border-slate-200/50 text-xs font-mono">
+            <div className="grid grid-cols-2 p-1 bg-slate-100/80 rounded-xl border border-slate-200/50 text-xs font-mono gap-1">
               <button
                 type="button"
                 onClick={() => setActiveTab('signin')}
-                className={`py-2 rounded-xl font-bold flex items-center justify-center gap-2 transition ${
+                className={`py-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition ${
                   activeTab === 'signin'
-                    ? 'bg-gradient-to-r from-blue-600 to-sky-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <LogIn className="w-3.5 h-3.5" />
@@ -354,10 +322,10 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('signup')}
-                className={`py-2 rounded-xl font-bold flex items-center justify-center gap-2 transition ${
+                className={`py-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition ${
                   activeTab === 'signup'
-                    ? 'bg-gradient-to-r from-blue-600 to-sky-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <UserPlus className="w-3.5 h-3.5" />
@@ -386,13 +354,13 @@ export default function LoginPage() {
                         id: 'traffic_authority' as const,
                         label: 'Traffic Authority',
                         desc: 'Traffic Police & TMC',
-                        icon: ShieldAlert,
+                        icon: Shield,
                       },
                       {
                         id: 'municipal_authority' as const,
                         label: 'Municipal Authority',
                         desc: 'PWD & BBMP Civil',
-                        icon: Construction,
+                        icon: Building2,
                       },
                     ].map((r) => {
                       const Icon = r.icon;
@@ -430,8 +398,8 @@ export default function LoginPage() {
                       type="text"
                       value={officerName}
                       onChange={(e) => setOfficerName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50/70 border border-slate-200 text-xs text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
-                      placeholder="Full name"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50/70 border border-slate-200 text-xs text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                      placeholder="Enter your name..."
                       required
                     />
                   </div>
@@ -448,7 +416,7 @@ export default function LoginPage() {
                       type="text"
                       value={badgeId}
                       onChange={(e) => setBadgeId(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50/70 border border-slate-200 text-xs font-mono text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50/70 border border-slate-200 text-xs font-mono text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
                       placeholder="e.g. #MC-904"
                       required
                     />
@@ -466,7 +434,7 @@ export default function LoginPage() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-slate-50/70 border border-slate-200 text-xs font-mono text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-50/70 border border-slate-200 text-xs font-mono text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
                       placeholder="••••••••••••"
                       required
                     />
@@ -480,11 +448,11 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* Primary Action Button */}
+                {/* Primary Button */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-600 to-sky-600 hover:opacity-95 text-white font-mono text-xs font-bold uppercase tracking-wider shadow-lg shadow-blue-500/25 transition active:scale-[0.99] flex items-center justify-center gap-2 mt-1 cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-mono text-xs font-bold uppercase tracking-wider shadow-md shadow-blue-600/20 transition active:scale-[0.99] flex items-center justify-center gap-2 mt-1 cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -510,7 +478,7 @@ export default function LoginPage() {
                   <select
                     value={signupRole}
                     onChange={(e) => setSignupRole(e.target.value as UserRole)}
-                    className="w-full px-3 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-blue-600 focus:bg-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-blue-600 focus:bg-white"
                   >
                     <option value="admin">👑 Admin / Joint Command Directorate</option>
                     <option value="traffic_authority">👮 Traffic Authority (Traffic Police & TMC)</option>
@@ -527,7 +495,7 @@ export default function LoginPage() {
                     placeholder="Enter officer full name..."
                     value={signupName}
                     onChange={(e) => setSignupName(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-blue-600 transition"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-blue-600 transition"
                     required
                   />
                 </div>
@@ -541,7 +509,7 @@ export default function LoginPage() {
                     placeholder="e.g. #BTP-902"
                     value={signupBadgeId}
                     onChange={(e) => setSignupBadgeId(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 font-mono text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-blue-600 transition"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-blue-600 transition"
                     required
                   />
                 </div>
@@ -556,7 +524,7 @@ export default function LoginPage() {
                       placeholder="officer@gov.in"
                       value={signupEmail}
                       onChange={(e) => setSignupEmail(e.target.value)}
-                      className="w-full px-3 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-mono"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-mono"
                     />
                   </div>
                   <div className="space-y-1">
@@ -568,7 +536,7 @@ export default function LoginPage() {
                       placeholder="••••••"
                       value={signupPin}
                       onChange={(e) => setSignupPin(e.target.value)}
-                      className="w-full px-3 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-mono"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-mono"
                       required
                     />
                   </div>
@@ -577,7 +545,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-600 to-sky-600 hover:opacity-95 text-white font-mono text-xs font-bold uppercase transition shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 mt-2 cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-mono text-xs font-bold uppercase transition shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 mt-2 cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -609,13 +577,16 @@ export default function LoginPage() {
 
       </main>
 
-      {/* 4. Footer */}
-      <footer className="relative z-10 w-full px-6 sm:px-12 py-3 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-400 gap-2 border-t border-slate-200/40">
+      {/* 4. Footer: People Places Progress on Left, Cleaner Safer Smarter Together on Right */}
+      <footer className="relative z-10 w-full px-6 sm:px-12 py-3 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-500 gap-2">
         <div>
-          <span>PEOPLE &nbsp;|&nbsp; PLACES &nbsp;|&nbsp; PROGRESS</span>
+          <span className="font-semibold tracking-wider">PEOPLE &nbsp;|&nbsp; PLACES &nbsp;|&nbsp; PROGRESS</span>
         </div>
-        <div className="tracking-widest uppercase font-semibold text-slate-400">
-          CLEANER • SAFER • SMARTER • TOGETHER
+        <div className="flex flex-col text-right text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase leading-tight">
+          <span>CLEANER</span>
+          <span>SAFER</span>
+          <span>SMARTER</span>
+          <span>TOGETHER</span>
         </div>
       </footer>
 
