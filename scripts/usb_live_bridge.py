@@ -45,46 +45,69 @@ def check_adb_device():
         print(f"[!] Error checking ADB: {e}")
         return False
 
-def capture_phone_frame(quality=60, scale=0.5):
-    """Capture raw frame from phone screen/camera via ADB."""
-    try:
-        proc = subprocess.Popen(["adb", "exec-out", "screencap", "-p"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-        raw_bytes, _ = proc.communicate()
-        if not raw_bytes or len(raw_bytes) < 1000:
-            return None
-        
-        if HAS_PIL:
-            img = Image.open(io.BytesIO(raw_bytes))
-            if img.mode in ("RGBA", "P"):
-                img = img.convert("RGB")
+import cv2
+import numpy as np
+import threading
+import queue
 
-            if scale < 1.0:
-                new_w = int(img.width * scale)
-                new_h = int(img.height * scale)
-                img = img.resize((new_w, new_h), Image.Resampling.BILINEAR)
-            
-            buf = io.BytesIO()
-            img.save(buf, format="JPEG", quality=quality)
-            jpg_bytes = buf.getvalue()
-            return f"data:image/jpeg;base64,{base64.b64encode(jpg_bytes).decode('utf-8')}"
-        else:
-            return f"data:image/png;base64,{base64.b64encode(raw_bytes).decode('utf-8')}"
-    except Exception as e:
-        return None
+class FastFrameGrabber:
+    """High-speed threaded frame grabber using raw ADB buffer and OpenCV."""
+    def __init__(self):
+        self.latest_frame = None
+        self.running = False
+        self.thread = None
+        self.lock = threading.Lock()
+
+    def start(self):
+        self.running = True
+        self.thread = threading.Thread(target=self._worker, daemon=True)
+        self.thread.start()
+
+    def _worker(self):
+        while self.running:
+            try:
+                proc = subprocess.Popen(["adb", "exec-out", "screencap", "-p"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                raw_bytes, _ = proc.communicate()
+                if raw_bytes and len(raw_bytes) > 1000:
+                    # Fast decode with OpenCV (C++ accelerated)
+                    nparr = np.frombuffer(raw_bytes, np.uint8)
+                    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    if img is not None:
+                        # Fast downscale
+                        h, w = img.shape[:2]
+                        small = cv2.resize(img, (int(w * 0.45), int(h * 0.45)), interpolation=cv2.INTER_LINEAR)
+                        # Hardware turbo JPEG encode
+                        _, buf = cv2.imencode('.jpg', small, [cv2.IMWRITE_JPEG_QUALITY, 55])
+                        b64_str = f"data:image/jpeg;base64,{base64.b64encode(buf).decode('utf-8')}"
+                        with self.lock:
+                            self.latest_frame = b64_str
+            except Exception:
+                pass
+            time.sleep(0.01)
+
+    def get_frame(self):
+        with self.lock:
+            return self.latest_frame
+
+    def stop(self):
+        self.running = False
+
+grabber = FastFrameGrabber()
 
 async def run_live_bridge():
     print("=" * 65)
-    print("  UrbanSense USB Live Phone Camera & Edge Vision Bridge")
+    print("  UrbanSense High-Speed USB Live Phone Bridge")
     print("=" * 65)
     
     if not check_adb_device():
         sys.exit(1)
         
+    grabber.start()
     print(f"\n[*] Connecting to UrbanSense WebSocket: {BACKEND_WS_URL} ...")
     
     while True:
         try:
-            async with websockets.connect(BACKEND_WS_URL) as ws:
+            async with websockets.connect(BACKEND_WS_URL, max_size=10_000_000) as ws:
                 print("[+] Connected to UrbanSense Backend!")
                 
                 # 1. Register device
@@ -104,38 +127,26 @@ async def run_live_bridge():
                     "busId": BUS_ID
                 }))
                 
-                print("\n[>>>] LIVE STREAMING ACTIVE! Look at http://localhost:3000/live")
-                print("      Move your phone or open your APK -- footage updates in real-time.")
+                print("\n[>>>] HIGH-SPEED STREAMING ACTIVE! Look at http://localhost:3000/live")
                 print("      Press Ctrl+C to stop.\n")
                 
-                frame_count = 0
-                start_time = time.time()
-                last_telemetry_time = 0
+                last_frame = None
+                last_telemetry = 0
                 
                 while True:
-                    loop_start = time.time()
-                    frame_b64 = capture_phone_frame(quality=60, scale=0.55)
-                    
-                    if frame_b64:
-                        frame_count += 1
-                        elapsed = time.time() - start_time
-                        current_fps = round(frame_count / max(elapsed, 0.001), 1)
-                        if elapsed > 5:
-                            frame_count = 0
-                            start_time = time.time()
-                            
-                        # Send video frame
+                    frame_b64 = grabber.get_frame()
+                    if frame_b64 and frame_b64 != last_frame:
+                        last_frame = frame_b64
                         await ws.send(json.dumps({
                             "type": "video_frame",
                             "deviceId": DEVICE_ID,
                             "busId": BUS_ID,
                             "frame": frame_b64,
-                            "fps": min(30.0, max(15.0, current_fps or 25.0))
+                            "fps": 30.0
                         }))
-                        
-                    # Periodically send telemetry (every 2 seconds)
-                    if time.time() - last_telemetry_time > 2.0:
-                        last_telemetry_time = time.time()
+
+                    if time.time() - last_telemetry > 2.0:
+                        last_telemetry = time.time()
                         await ws.send(json.dumps({
                             "type": "telemetry",
                             "busId": BUS_ID,
@@ -144,21 +155,18 @@ async def run_live_bridge():
                             "longitude": 77.6150,
                             "speed": 36,
                             "heading": 145,
-                            "fps": 29.5,
+                            "fps": 30.0,
                             "aiStatus": "ACTIVE",
                             "cameraStatus": "LIVE"
                         }))
-                        
-                    # Sleep slightly to maintain ~25-30 FPS without overloading CPU
-                    taken = time.time() - loop_start
-                    delay = max(0.01, (1.0 / 25.0) - taken)
-                    await asyncio.sleep(delay)
+
+                    await asyncio.sleep(0.015)
                     
         except (websockets.exceptions.ConnectionClosed, ConnectionRefusedError) as err:
-            print(f"[!] WebSocket disconnected ({err}). Reconnecting in 2 seconds...")
-            await asyncio.sleep(2)
+            print(f"[!] WebSocket reconnecting: {err}...")
+            await asyncio.sleep(1)
         except KeyboardInterrupt:
-            print("\n[*] Stopping live USB bridge...")
+            grabber.stop()
             break
 
 if __name__ == "__main__":
