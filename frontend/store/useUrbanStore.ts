@@ -14,6 +14,7 @@ import {
 } from '@/types';
 import { initialIncidents } from '@/data/mockIncidents';
 import { initialBuses } from '@/data/mockBuses';
+import { apiService, setAuthToken } from '@/services/api';
 
 export const AUTHORITY_PROFILES: Record<UserRole, UserProfile> = {
   admin: {
@@ -84,6 +85,7 @@ interface UrbanState {
   logout: () => void;
 
   // Actions
+  fetchInitialData: () => Promise<void>;
   addIncident: (event: IncidentEvent) => void;
   updateIncidentStatus: (id: string, status: IncidentStatus) => void;
   assignDepartment: (id: string, department: DepartmentType) => void;
@@ -192,6 +194,26 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
     search: '',
   },
 
+  fetchInitialData: async () => {
+    try {
+      const [stats, incidents, alerts, fleet] = await Promise.all([
+        apiService.getDashboard(),
+        apiService.getIncidents(),
+        apiService.getAlerts(),
+        apiService.getFleet(),
+      ]);
+
+      set({
+        stats: stats || computeInitialStats(incidents || initialIncidents),
+        incidents: incidents && incidents.length > 0 ? incidents : initialIncidents,
+        alerts: alerts && alerts.length > 0 ? alerts : initialAlertsList,
+        buses: fleet && fleet.length > 0 ? fleet : initialBuses,
+      });
+    } catch {
+      // Retain fallback data
+    }
+  },
+
   setCurrentUser: (user: UserProfile) => set({ currentUser: user, isAuthenticated: true }),
   
   switchRole: (role: UserRole) => {
@@ -226,7 +248,10 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
 
   login: (user: UserProfile) => set({ currentUser: user, isAuthenticated: true }),
 
-  logout: () => set({ isAuthenticated: false }),
+  logout: () => {
+    apiService.logout();
+    set({ isAuthenticated: false });
+  },
 
   addIncident: (event: IncidentEvent) => {
     set((state) => {
@@ -280,6 +305,9 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
   },
 
   updateIncidentStatus: (id: string, status: IncidentStatus) => {
+    // Asynchronously sync to backend
+    apiService.updateIncidentStatus(id, status).catch(() => {});
+
     set((state) => {
       const updatedIncidents = state.incidents.map((inc) =>
         inc.id === id ? { ...inc, status } : inc
@@ -317,6 +345,7 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
   },
 
   dismissAlert: (alertId: string) => {
+    apiService.updateAlertStatus(alertId, 'dismissed').catch(() => {});
     const alert = get().alerts.find((a) => a.id === alertId);
     if (alert) {
       get().updateIncidentStatus(alert.incident_id, 'dismissed');
@@ -324,6 +353,7 @@ export const useUrbanStore = create<UrbanState>((set, get) => ({
   },
 
   resolveAlert: (alertId: string) => {
+    apiService.updateAlertStatus(alertId, 'resolved').catch(() => {});
     const alert = get().alerts.find((a) => a.id === alertId);
     if (alert) {
       get().updateIncidentStatus(alert.incident_id, 'resolved');

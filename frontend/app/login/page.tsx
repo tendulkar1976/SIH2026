@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import { apiService } from '@/services/api';
+
 export default function LoginPage() {
   const router = useRouter();
   const { login, registerOfficer } = useUrbanStore();
@@ -27,9 +29,10 @@ export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<UserRole>('admin');
   const [officerName, setOfficerName] = useState('Commander R. Menon');
   const [badgeId, setBadgeId] = useState('#MC-904');
-  const [password, setPassword] = useState('••••••••••••');
+  const [password, setPassword] = useState('adminpassword');
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Sign Up State
   const [signupName, setSignupName] = useState('');
@@ -41,21 +44,32 @@ export default function LoginPage() {
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
+    setErrorMessage(null);
     if (role === 'admin') {
       setOfficerName('Commander R. Menon');
       setBadgeId('#MC-904');
+      setPassword('adminpassword');
     } else if (role === 'traffic_authority') {
       setOfficerName('ACP V. Sharma');
       setBadgeId('#BTP-412');
+      setPassword('trafficpassword');
     } else {
       setOfficerName('Eng. K. Priya');
       setBadgeId('#BBMP-780');
+      setPassword('municipalpassword');
     }
   };
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
+
+    // Map role or username for backend auth
+    const username = selectedRole === 'admin' ? 'admin' : selectedRole === 'traffic_authority' ? 'traffic' : 'municipal';
+    const pwd = password || (selectedRole === 'admin' ? 'adminpassword' : selectedRole === 'traffic_authority' ? 'trafficpassword' : 'municipalpassword');
+
+    const result = await apiService.login(username, pwd);
 
     const name = officerName.trim() || (selectedRole === 'admin' ? 'Admin Officer' : selectedRole === 'traffic_authority' ? 'Traffic Officer' : 'Municipal Officer');
     const badge = badgeId.trim() || '#OCC-001';
@@ -81,7 +95,7 @@ export default function LoginPage() {
         ? 'Traffic Enforcement Officer'
         : 'Chief Infrastructure Engineer';
 
-    const userProfile: UserProfile = {
+    const userProfile: UserProfile = result.user || {
       id: `usr-${Date.now()}`,
       name: name.toUpperCase(),
       initials,
@@ -94,18 +108,16 @@ export default function LoginPage() {
     };
 
     login(userProfile);
-
-    setTimeout(() => {
-      setLoading(false);
-      router.push('/dashboard');
-    }, 400);
+    setLoading(false);
+    router.push('/dashboard');
   };
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!signupName.trim() || !signupBadgeId.trim()) return;
 
     setLoading(true);
+    setErrorMessage(null);
 
     const defaultDept =
       signupRole === 'admin'
@@ -120,6 +132,11 @@ export default function LoginPage() {
         : signupRole === 'traffic_authority'
         ? 'Traffic Enforcement Specialist'
         : 'Civic Infrastructure Engineer';
+
+    const username = signupName.toLowerCase().replace(/\s+/g, '_');
+    const pwd = signupPin || 'officer123';
+
+    await apiService.register(username, pwd, signupRole);
 
     registerOfficer({
       name: signupName.trim().toUpperCase(),
@@ -138,7 +155,7 @@ export default function LoginPage() {
     setTimeout(() => {
       setLoading(false);
       router.push('/dashboard');
-    }, 600);
+    }, 400);
   };
 
   return (

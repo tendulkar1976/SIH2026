@@ -40,10 +40,29 @@ class RealtimeService {
 
       this.socket.onmessage = (messageEvent) => {
         try {
-          const data = JSON.parse(messageEvent.data);
-          // Check if it's a canonical incident event or telemetry
-          if (data && data.id && data.type) {
-            this.handleEvent(data as IncidentEvent);
+          const payload = JSON.parse(messageEvent.data);
+          const eventItem = payload?.data || payload;
+          if (eventItem && (eventItem.id || eventItem.incident_id)) {
+            const mappedEvent: IncidentEvent = {
+              id: eventItem.id || eventItem.incident_id,
+              type: eventItem.type || eventItem.incident_type || eventItem.incidentType || 'pothole',
+              severity: eventItem.severity || 'medium',
+              confidence: eventItem.confidence ?? 0.95,
+              timestamp: eventItem.timestamp || new Date().toISOString(),
+              latitude: eventItem.location?.latitude ?? eventItem.latitude ?? 12.9716,
+              longitude: eventItem.location?.longitude ?? eventItem.longitude ?? 77.5946,
+              bus_id: eventItem.busId || eventItem.bus_id || 'BUS-101',
+              route_id: eventItem.routeId || eventItem.route_id || 'R-05',
+              vehicle_id: eventItem.vehicle_id || null,
+              license_plate: eventItem.license_plate || null,
+              status: eventItem.status || 'new',
+              assigned_department: eventItem.assigned_department || 'municipal_corp',
+              work_order_id: eventItem.work_order_id,
+              evidence_image: eventItem.evidence_image || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80',
+              evidence_video: eventItem.evidence_video || null,
+              description: eventItem.description || 'AI Edge vision detection recorded.',
+            };
+            this.handleEvent(mappedEvent);
           }
         } catch (err) {
           console.error('[UrbanSense Realtime] Error parsing WebSocket payload:', err);
