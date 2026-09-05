@@ -36,15 +36,10 @@ async def websocket_endpoint(websocket: WebSocket):
                         "busId": msg.get("busId", "BUS-102")
                     })
                 elif msg_type == "device_disconnected":
-                    dev = edge_hub.get_device(msg.get("deviceId", "BUS-NODE-#1042"))
-                    dev["status"] = "DISCONNECTED"
-                    dev["cameraStatus"] = "OFFLINE"
-                    dev["isRealPhone"] = False
-                    await manager.broadcast({
-                        "type": "device_disconnected",
-                        "deviceId": msg.get("deviceId", "BUS-NODE-#1042"),
-                        "busId": msg.get("busId", "BUS-102")
-                    })
+                    await edge_hub.disconnect_device(
+                        device_id=msg.get("deviceId", "BUS-NODE-#1042"),
+                        bus_id=msg.get("busId", "BUS-102")
+                    )
                 elif msg_type == "stream_ready":
                     dev = edge_hub.get_device(msg.get("deviceId", "BUS-NODE-#1042"))
                     dev["streamStatus"] = "READY"
@@ -71,6 +66,8 @@ async def websocket_endpoint(websocket: WebSocket):
                         speed=float(msg.get("speed", 0.0)),
                         heading=float(msg.get("heading", 0.0)),
                         fps=float(msg.get("fps", 30.0)),
+                        ai_status=msg.get("aiStatus", "ACTIVE"),
+                        camera_status=msg.get("cameraStatus", "LIVE"),
                         timestamp=msg.get("timestamp")
                     )
                 elif msg_type == "video_frame":

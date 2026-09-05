@@ -51,6 +51,14 @@ class RealtimeService {
             store.setEdgeStatus('STREAM_READY');
           }
 
+          // 1b. Edge Device Disconnected Broadcast
+          if (payload.type === 'device_disconnected') {
+            console.log('[Realtime] Device disconnected:', payload.deviceId);
+            store.setRealPhoneConnected(false);
+            store.setEdgeStatus('DISCONNECTED');
+            store.setLivePhoneFrame(null);
+          }
+
           // 2. Live Video Frame Broadcast (Dual-Channel Backup)
           if (payload.type === 'video_frame' && payload.frame) {
             store.setLivePhoneFrame(payload.frame);
@@ -71,14 +79,22 @@ class RealtimeService {
             });
           }
 
-          // 3. Real-time GPS Telemetry
-          if (payload.type === 'gps_update') {
+          // 3b. Real-time GPS & Device Telemetry
+          if (payload.type === 'telemetry' || payload.type === 'gps_update') {
             store.updateEdgeTelemetry({
               latitude: payload.latitude,
               longitude: payload.longitude,
               speed: payload.speed,
               fps: payload.fps,
             });
+            if (payload.busId) {
+              store.updateBusTelemetry(payload.busId, {
+                current_latitude: payload.latitude,
+                current_longitude: payload.longitude,
+                speed_kmh: payload.speed,
+                fps: payload.fps,
+              });
+            }
           }
 
           // 4. Real-time AI Detections from Phone

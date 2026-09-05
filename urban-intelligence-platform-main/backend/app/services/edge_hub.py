@@ -142,8 +142,48 @@ class EdgeDeviceHub:
             "fps": fps,
             "timestamp": datetime.now(timezone.utc).isoformat()
         })
-        dev["gpsStatus"] = "ACTIVE"
 
+    async def update_telemetry(
+        self,
+        bus_id: str,
+        device_id: str,
+        latitude: float,
+        longitude: float,
+        speed: float = 0.0,
+        heading: float = 0.0,
+        fps: float = 30.0,
+        ai_status: str = "ACTIVE",
+        camera_status: str = "LIVE",
+        timestamp: Optional[str] = None
+    ):
+        dev = self.get_device(device_id)
+        dev["busId"] = bus_id
+        dev["latitude"] = latitude
+        dev["longitude"] = longitude
+        dev["speed"] = speed
+        dev["heading"] = heading
+        dev["fps"] = fps
+        dev["aiStatus"] = ai_status
+        dev["cameraStatus"] = camera_status
+        dev["gpsStatus"] = "ACTIVE"
+        now_str = timestamp or datetime.now(timezone.utc).isoformat()
+        dev["lastSeen"] = now_str
+
+        # Primary user specification telemetry payload
+        await manager.broadcast({
+            "type": "telemetry",
+            "busId": bus_id,
+            "deviceId": device_id,
+            "latitude": latitude,
+            "longitude": longitude,
+            "speed": speed,
+            "heading": heading,
+            "fps": fps,
+            "aiStatus": ai_status,
+            "cameraStatus": camera_status,
+            "timestamp": now_str
+        })
+        # Legacy GIS map event
         await manager.broadcast({
             "type": "gps_update",
             "busId": bus_id,
@@ -153,6 +193,26 @@ class EdgeDeviceHub:
             "speed": speed,
             "heading": heading,
             "fps": fps,
+            "timestamp": now_str
+        })
+
+    async def disconnect_device(self, device_id: str, bus_id: str = "BUS-102"):
+        dev = self.get_device(device_id)
+        dev["status"] = "DISCONNECTED"
+        dev["cameraStatus"] = "OFFLINE"
+        dev["aiStatus"] = "INACTIVE"
+        dev["gpsStatus"] = "INACTIVE"
+        dev["streamStatus"] = "NOT_READY"
+        dev["isRealPhone"] = False
+        now_str = datetime.now(timezone.utc).isoformat()
+        dev["lastSeen"] = now_str
+
+        await manager.broadcast({
+            "type": "device_disconnected",
+            "deviceId": device_id,
+            "busId": bus_id,
+            "status": "DISCONNECTED",
+            "message": f"Device {device_id} disconnected",
             "timestamp": now_str
         })
 
