@@ -11,12 +11,12 @@ export const initialBuses: BusTelemetry[] = [
     processing_status: 'INFERENCE_ACTIVE',
     fps: 29.8,
     latency_ms: 42,
-    current_latitude: 12.9352,
-    current_longitude: 77.6245,
-    location_name: 'Koramangala 80ft Road, 4th Block',
-    speed_kmh: 38,
-    heading_deg: 94,
-    incidents_today: 14,
+    current_latitude: 12.9340,
+    current_longitude: 77.6150,
+    location_name: 'Hosur Main Road, Koramangala Checkpost',
+    speed_kmh: 36,
+    heading_deg: 145,
+    incidents_today: 5,
     last_update: new Date().toISOString(),
     detections_in_frame: [
       {

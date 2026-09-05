@@ -30,28 +30,21 @@ interface MapViewProps {
   height?: string;
 }
 
-// Key municipal bus transit corridor trajectory for single active bus node BUS-102
+// Key municipal bus transit corridor trajectory for single active bus node BUS-102 (Majestic -> Silk Board)
 const routePolylines: Record<string, [number, number][]> = {
   'R-12': [
-    [12.9772, 77.5713], // Majestic KBS Platform 14
-    [12.9698, 77.5878], // Hudson Circle / Corporation
-    [12.9665, 77.5990], // Richmond Circle
-    [12.9554, 77.5932], // Shanthinagar Bus Station
-    [12.9507, 77.5848], // Lalbagh Main Gate
-    [12.9431, 77.5950], // Wilson Garden 10th Cross
-    [12.9372, 77.6001], // Dairy Circle Underpass
-    [12.9344, 77.6059], // Christ University / Hosur Rd
-    [12.9388, 77.6134], // Adugodi Bosch Gate
-    [12.9341, 77.6189], // Sony World Signal (100ft Rd)
-    [12.9352, 77.6245], // Koramangala 80ft Rd 4th Block (BUS-102 Position)
-    [12.9304, 77.6152], // Forum Mall Junction
-    [12.9298, 77.6212], // St. John's Signal
-    [12.9224, 77.6198], // Madiwala Market
-    [12.9180, 77.6225], // Madiwala Lake Road
-    [12.9174, 77.6238], // Silk Board Junction Underpass
-    [12.9141, 77.6101], // Silk Board Flyover Ramp
-    [12.9150, 77.6050], // BTM 2nd Stage Ring Road
-    [12.9115, 77.6388], // HSR Layout 14th Main
+    [12.9772, 77.5713], // 🟢 SOURCE: Kempegowda Bus Station (Majestic)
+    [12.9740, 77.5790], // KG Road / Mysore Bank Junction
+    [12.9698, 77.5878], // Hudson Circle / Corporation (INC-1051: Missing Zebra)
+    [12.9640, 77.5975], // Richmond Circle Flyover (INC-1052: Red Light Breach)
+    [12.9540, 77.5960], // Shanthinagar Bus Station
+    [12.9440, 77.5990], // Wilson Garden 10th Cross
+    [12.9372, 77.6030], // Dairy Circle Underpass (INC-1053: Road Pothole)
+    [12.9345, 77.6080], // Christ University / SG Palya
+    [12.9340, 77.6150], // Forum Mall / Koramangala Checkpost (BUS-102 ACTIVE NODE)
+    [12.9280, 77.6210], // St. John's Hospital Signal (INC-1054: Hit-and-Run)
+    [12.9220, 77.6225], // Madiwala Police Station
+    [12.9174, 77.6238], // 🏁 DESTINATION: Silk Board Underpass (INC-1055: Waterlogging)
   ],
 };
 
@@ -140,9 +133,9 @@ export const MapView: React.FC<MapViewProps> = ({
       });
 
       if (!mapInstanceRef.current) {
-        // Centered across the active Bangalore Route R-12 transit corridor
+        // Centered directly across the Majestic KBS ⇄ Silk Board corridor
         const map = L.map(mapContainerRef.current, {
-          center: [12.9420, 77.6100],
+          center: [12.9473, 77.5975],
           zoom: 13,
           zoomControl: false,
         });
@@ -199,15 +192,12 @@ export const MapView: React.FC<MapViewProps> = ({
   }, [tileMode]);
 
   // Route condition definitions
+  // Route condition definitions
   const routeConditionMeta: Record<string, { color: string; rci: number; status: string; name: string; density: number }> = {
-    'R-18': { color: '#dc2626', rci: 54, status: 'Critical Distress', name: 'Whitefield Corridor', density: 4.8 },
-    'R-05': { color: '#d97706', rci: 68, status: 'Degraded', name: 'Electronic City Spine', density: 2.3 },
-    'R-24': { color: '#ea580c', rci: 73, status: 'Moderate', name: 'Silk Board Corridor', density: 1.8 },
-    'R-12': { color: '#16a34a', rci: 84, status: 'Good Condition', name: 'Koramangala 80ft', density: 1.1 },
-    'R-09': { color: '#059669', rci: 92, status: 'Optimal Surface', name: 'Hebbal Expressway', density: 0.4 },
+    'R-12': { color: '#4f46e5', rci: 82, status: 'Active Corridor', name: 'Majestic KBS ⇄ Silk Board Junction', density: 0.5 },
   };
 
-  // Render Bus Route Polylines with Road Condition Index Coloring
+  // Render Bus Route Polylines with Source & Destination Markers
   useEffect(() => {
     if (typeof window === 'undefined' || !mapInstanceRef.current) return;
 
@@ -222,24 +212,25 @@ export const MapView: React.FC<MapViewProps> = ({
         Object.entries(routePolylines).forEach(([routeId, coords]) => {
           const meta = routeConditionMeta[routeId] || {
             color: '#4f46e5',
-            rci: 75,
+            rci: 82,
             status: 'Normal',
             name: `Route ${routeId}`,
-            density: 1.5,
+            density: 0.5,
           };
 
+          // Draw active corridor polyline
           const poly = L.polyline(coords, {
-            color: meta.color,
-            weight: 4.5,
-            opacity: 0.8,
-            dashArray: '6, 6',
+            color: '#4f46e5',
+            weight: 5,
+            opacity: 0.85,
+            dashArray: '8, 8',
           }).addTo(map);
 
           poly.bindTooltip(
-            `<div style="font-family: inherit; font-size: 11px; padding: 2px;">
-              <strong style="color: ${meta.color}; font-size: 12px;">Bus Route ${routeId} • ${meta.name}</strong><br/>
-              <span>Road Condition: <strong>${meta.rci}/100 (${meta.status})</strong></span><br/>
-              <span>Defect Density: <strong>${meta.density} defects/km</strong></span>
+            `<div style="font-family: inherit; font-size: 11px; padding: 3px;">
+              <strong style="color: #4f46e5; font-size: 12px;">Bus Route ${routeId} • ${meta.name}</strong><br/>
+              <span>Origin: <strong>Majestic KBS</strong> ➔ Terminus: <strong>Silk Board</strong></span><br/>
+              <span>Corridor Status: <strong style="color: #16a34a;">${meta.status}</strong> (${meta.rci}/100)</span>
             </div>`,
             {
               permanent: false,
@@ -247,8 +238,39 @@ export const MapView: React.FC<MapViewProps> = ({
               className: 'route-poly-tooltip',
             }
           );
-
           routeLayersRef.current.push(poly);
+
+          // 1. Source Marker Badge (Majestic KBS)
+          const startCoord = coords[0];
+          const startIcon = L.divIcon({
+            html: `
+              <div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-700 border-2 border-white text-white text-[10px] font-mono font-bold shadow-md whitespace-nowrap">
+                <span>🟢 SOURCE: Majestic KBS</span>
+              </div>
+            `,
+            className: 'source-endpoint-marker',
+            iconSize: [140, 22],
+            iconAnchor: [70, 11],
+          });
+          const startMarker = L.marker(startCoord, { icon: startIcon, zIndexOffset: 800 }).addTo(map);
+          startMarker.bindPopup(`<strong>Corridor Origin</strong><br/>Kempegowda Bus Station (Majestic) Platform 14`);
+          routeLayersRef.current.push(startMarker);
+
+          // 2. Destination Marker Badge (Silk Board Junction)
+          const endCoord = coords[coords.length - 1];
+          const endIcon = L.divIcon({
+            html: `
+              <div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900 border-2 border-white text-white text-[10px] font-mono font-bold shadow-md whitespace-nowrap">
+                <span>🏁 DEST: Silk Board</span>
+              </div>
+            `,
+            className: 'dest-endpoint-marker',
+            iconSize: [120, 22],
+            iconAnchor: [60, 11],
+          });
+          const endMarker = L.marker(endCoord, { icon: endIcon, zIndexOffset: 800 }).addTo(map);
+          endMarker.bindPopup(`<strong>Corridor Destination</strong><br/>Silk Board Junction Underpass Terminal`);
+          routeLayersRef.current.push(endMarker);
         });
       }
     });
@@ -462,10 +484,8 @@ export const MapView: React.FC<MapViewProps> = ({
               { id: 'all', label: 'All Incidents' },
               { id: 'potholes', label: 'Road Potholes' },
               { id: 'waterlogging', label: 'Waterlogging' },
-              { id: 'damaged_divider', label: 'Dividers' },
               { id: 'missing_crossings', label: 'Missing Zebra' },
-              { id: 'rash_driving', label: 'Rash Driving' },
-              { id: 'bus_footboard', label: 'Footboard' },
+              { id: 'rash_driving', label: 'Red Light' },
               { id: 'hit_and_run', label: 'Hit-and-Run' },
             ].map((cat) => {
               const isSelected = activeFilter === cat.id;

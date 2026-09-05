@@ -17,12 +17,12 @@ export default function MapPage() {
   const [selectedCategory, setSelectedCategory] = useState<MapFilterCategory>('all');
 
   const filterButtons = [
-    { id: 'all' as const, label: 'All Incidents', count: incidents.length, icon: Layers, color: 'text-slate-700' },
-    { id: 'potholes' as const, label: 'Road Potholes', count: stats.potholes, icon: Construction, color: 'text-amber-600' },
-    { id: 'missing_crossings' as const, label: 'Missing Crossings', count: stats.missing_crossings, icon: Footprints, color: 'text-pewter-blue' },
-    { id: 'rash_driving' as const, label: 'Rash Driving', count: stats.rash_driving, icon: AlertTriangle, color: 'text-rose-600' },
-    { id: 'hit_and_run' as const, label: 'Hit-and-Run', count: incidents.filter((i) => i.description.toLowerCase().includes('hit-and-run') || i.id === 'INC-1051').length, icon: AlertTriangle, color: 'text-red-600' },
-    { id: 'traffic' as const, label: 'Traffic Anomalies', count: stats.vehicles + stats.pedestrian_events + stats.anpr_events, icon: Car, color: 'text-slate-600' },
+    { id: 'all' as const, label: 'All Corridor Incidents', count: incidents.length, icon: Layers, color: 'text-slate-700' },
+    { id: 'potholes' as const, label: 'Road Potholes', count: incidents.filter((i) => i.type === 'pothole').length, icon: Construction, color: 'text-amber-600' },
+    { id: 'waterlogging' as const, label: 'Waterlogging Hazard', count: incidents.filter((i) => i.type === 'waterlogging').length, icon: Layers, color: 'text-sky-600' },
+    { id: 'missing_crossings' as const, label: 'Missing Crossings', count: incidents.filter((i) => i.type === 'missing_crossing').length, icon: Footprints, color: 'text-pewter-blue' },
+    { id: 'rash_driving' as const, label: 'Red Light Breach', count: incidents.filter((i) => i.type === 'red_light_violation' || i.type === 'rash_driving' || i.type === 'wrong_way').length, icon: AlertTriangle, color: 'text-rose-600' },
+    { id: 'hit_and_run' as const, label: 'Hit-and-Run Alert', count: incidents.filter((i) => i.type === 'hit_and_run' || i.description.toLowerCase().includes('hit-and-run') || i.id === 'INC-1054').length, icon: AlertTriangle, color: 'text-red-600' },
   ];
 
   return (
