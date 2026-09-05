@@ -146,7 +146,7 @@ export const FleetCard: React.FC<FleetCardProps> = ({ bus, onSelect }) => {
       <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
         <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
           <Clock className="w-3 h-3" />
-          <span>{bus.last_update || 'Just now'}</span>
+          <span suppressHydrationWarning>{bus.last_update || 'Just now'}</span>
         </div>
 
         <button

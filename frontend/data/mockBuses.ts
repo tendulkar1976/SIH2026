@@ -17,7 +17,7 @@ export const initialBuses: BusTelemetry[] = [
     speed_kmh: 36,
     heading_deg: 145,
     incidents_today: 5,
-    last_update: new Date().toISOString(),
+    last_update: 'Just now',
     detections_in_frame: [
       {
         id: 'det-1',
